@@ -34,6 +34,8 @@ func GetInstance() *Game {
 }
 
 type Game struct {
+	// 资源管理器
+	assetStore *AssetStore
 	// 屏幕大小
 	screenSize mgl32.Vec2
 	// 游戏帧率
@@ -74,6 +76,9 @@ func (g *Game) Init(title string, width, height int32, scene IScene) error {
 	if !ttf.Init() {
 		return fmt.Errorf("ttf init error,%s", sdl.GetError())
 	}
+
+	// 创建资源管理器
+	g.assetStore = CreateAssetStore(g.sdlRenderer)
 
 	g.currentScene = scene
 	g.currentScene.Init()
