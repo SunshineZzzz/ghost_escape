@@ -1,6 +1,9 @@
 package core
 
 import (
+	"container/list"
+
+	"github.com/SunshineZzzz/purego-sdl3/sdl"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -25,8 +28,10 @@ type Scene struct {
 	WorldSize mgl32.Vec2
 	// 摄像机位置
 	CameraPositon mgl32.Vec2
-	// 场景中的物体
-	Objects []IObject
+	// 世界对象孩子
+	ChildrenWorld list.List
+	// 屏幕对象孩子
+	ChildrenScreen list.List
 }
 
 var _ IObject = (*Scene)(nil)
@@ -53,4 +58,89 @@ func (s *Scene) SetCameraPosition(pos mgl32.Vec2) {
 // 获取世界大小
 func (s *Scene) GetWorldSize() mgl32.Vec2 {
 	return s.WorldSize
+}
+
+// 初始化
+func (s *Scene) Init() {
+	s.Object.Init()
+	s.ChildrenWorld.Init()
+	s.ChildrenScreen.Init()
+}
+
+// 处理事件
+func (s *Scene) HandleEvent(event *sdl.Event) {
+	s.Object.HandleEvent(event)
+	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).HandleEvent(event)
+	}
+	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).HandleEvent(event)
+	}
+}
+
+// 更新
+func (s *Scene) Update(dt float32) {
+	s.Object.Update(dt)
+	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Update(dt)
+	}
+	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Update(dt)
+	}
+}
+
+// 渲染
+func (s *Scene) Render() {
+	s.Object.Render()
+	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Render()
+	}
+	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Render()
+	}
+}
+
+// 清理
+func (s *Scene) Clean() {
+	s.Object.Clean()
+	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Clean()
+	}
+	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Clean()
+	}
+	s.ChildrenWorld.Init()
+	s.ChildrenScreen.Init()
+}
+
+// 增加孩子
+func (s *Scene) AddChild(child IObject) {
+	switch child.GetType() {
+	case ObjectTypeWorld:
+		s.ChildrenWorld.PushBack(child)
+	case ObjectTypeScreen:
+		s.ChildrenScreen.PushBack(child)
+	default:
+		s.Object.AddChild(child)
+	}
+}
+
+// 移除孩子
+func (s *Scene) RemoveChild(child IObject) {
+	switch child.GetType() {
+	case ObjectTypeWorld:
+		for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
+			if e.Value.(IObject) == child {
+				s.ChildrenWorld.Remove(e)
+			}
+		}
+	case ObjectTypeScreen:
+		for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
+			if e.Value.(IObject) == child {
+				s.ChildrenScreen.Remove(e)
+			}
+		}
+	default:
+		s.Object.RemoveChild(child)
+	}
 }

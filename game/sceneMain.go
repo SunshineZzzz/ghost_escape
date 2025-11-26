@@ -10,38 +10,36 @@ import (
 type SceneMain struct {
 	// 继承基础场景
 	core.Scene
-	// 玩家
-	player *Player
 }
 
 var _ core.IObject = (*SceneMain)(nil)
 var _ core.IScene = (*SceneMain)(nil)
 
 func (s *SceneMain) Init() {
+	s.Scene.Init()
 	s.WorldSize = s.Game().GetScreenSize().Mul(3.0)
 	s.CameraPositon = s.WorldSize.Mul(0.5).Sub(s.Game().GetScreenSize().Mul(0.5))
-	s.player = &Player{}
-	s.player.Init()
-	s.player.SetPosition(s.WorldSize.Mul(0.5))
+	player := &Player{}
+	player.Init()
+	player.SetPosition(s.WorldSize.Mul(0.5))
+	s.AddChild(player)
 }
 
 func (s *SceneMain) HandleEvent(event *sdl.Event) {
+	s.Scene.HandleEvent(event)
 }
 
 func (s *SceneMain) Update(dt float32) {
-	// 更新玩家
-	s.player.Update(dt)
+	s.Scene.Update(dt)
 }
 
 func (s *SceneMain) Render() {
 	s.renderBackground()
-	// 渲染玩家
-	s.player.Render()
+	s.Scene.Render()
 }
 
 func (s *SceneMain) Clean() {
-	// 清理玩家
-	s.player.Clean()
+	s.Scene.Clean()
 }
 
 // 非接口实现

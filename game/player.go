@@ -18,15 +18,18 @@ var _ core.IObjectScreen = (*Player)(nil)
 
 // 初始化
 func (p *Player) Init() {
+	p.Actor.Init()
 	p.MaxSpeed = 500.0
 }
 
 // 处理事件
 func (p *Player) HandleEvent(event *sdl.Event) {
+	p.Actor.HandleEvent(event)
 }
 
 // 更新
 func (p *Player) Update(dt float32) {
+	p.Actor.Update(dt)
 	// 速度慢慢减速
 	p.Velocity = p.Velocity.Mul(0.9)
 	p.Actor.Update(dt)
@@ -37,11 +40,13 @@ func (p *Player) Update(dt float32) {
 
 // 渲染
 func (p *Player) Render() {
+	p.Actor.Render()
 	p.Game().DrawBoundary(p.RenderPosition, p.RenderPosition.Add(mgl32.Vec2{20.0, 20.0}), 5.0, sdl.FColor{R: 1.0, G: 0.0, B: 0.0, A: 1.0})
 }
 
 // 清理
 func (p *Player) Clean() {
+	p.Actor.Clean()
 }
 
 // 非接口实现

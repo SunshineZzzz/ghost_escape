@@ -27,6 +27,12 @@ func (o *ObjectScreen) SetRenderPosition(pos mgl32.Vec2) {
 	o.RenderPosition = pos
 }
 
+// 初始化
+func (o *ObjectScreen) Init() {
+	o.Object.Init()
+	o.ObjectType = ObjectTypeScreen
+}
+
 // 非接口实现
 
 // 获取渲染(屏幕)位置

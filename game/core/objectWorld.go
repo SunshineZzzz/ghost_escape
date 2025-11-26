@@ -27,6 +27,12 @@ func (o *ObjectWorld) SetRenderPosition(pos mgl32.Vec2) {
 	o.Position = o.Game().GetCurrentScene().ScreenToWorld(pos)
 }
 
+// 初始化
+func (o *ObjectWorld) Init() {
+	o.ObjectScreen.Init()
+	o.ObjectType = ObjectTypeWorld
+}
+
 // 非接口实现
 
 // 获取世界位置
