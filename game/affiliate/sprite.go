@@ -6,6 +6,12 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// 精灵图抽象
+type ISprite interface {
+	// 设置纹理
+	SetTexture(*core.Texture)
+}
+
 // 精灵图
 type Sprite struct {
 	// 继承基础依附对象
@@ -15,6 +21,17 @@ type Sprite struct {
 }
 
 var _ core.IObject = (*Sprite)(nil)
+var _ ISprite = (*Sprite)(nil)
+
+// 添加精灵图子对象
+func AddSpriteChild(parent core.IObjectScreen, filePath string, scale float32) {
+	child := &Sprite{}
+	child.Init()
+	child.SetTexture(core.CreateTexture(filePath))
+	child.SetScale(scale)
+	child.SetParent(parent)
+	parent.AddChild(child)
+}
 
 // 初始化
 func (s *Sprite) Init() {
@@ -38,3 +55,5 @@ func (s *Sprite) SetTexture(texture *core.Texture) {
 	s.Texture = texture
 	s.Size = mgl32.Vec2{texture.SrcRect.W, texture.SrcRect.H}
 }
+
+// 非接口实现

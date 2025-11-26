@@ -54,3 +54,8 @@ func (o *ObjectAffiliate) GetSize() mgl32.Vec2 {
 func (o *ObjectAffiliate) SetSize(size mgl32.Vec2) {
 	o.Size = size
 }
+
+// 设置缩放比例
+func (o *ObjectAffiliate) SetScale(scale float32) {
+	o.Size = o.Size.Mul(scale)
+}

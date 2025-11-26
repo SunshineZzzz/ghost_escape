@@ -21,11 +21,8 @@ var _ core.IObjectScreen = (*Player)(nil)
 func (p *Player) Init() {
 	p.Actor.Init()
 	p.MaxSpeed = 500.0
-	sprite := &affiliate.Sprite{}
-	sprite.Init()
-	sprite.SetTexture(core.CreateTexture("assets/sprite/ghost-idle.png"))
-	sprite.SetParent(p)
-	p.AddChild(sprite)
+	// 添加精灵图子对象
+	affiliate.AddSpriteChild(p, "assets/sprite/ghost-idle.png", 0.5)
 }
 
 // 处理事件
