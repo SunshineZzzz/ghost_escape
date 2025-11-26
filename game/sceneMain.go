@@ -1,0 +1,57 @@
+package game
+
+import (
+	"ghost_escape/game/core"
+
+	"github.com/SunshineZzzz/purego-sdl3/sdl"
+	"github.com/go-gl/mathgl/mgl32"
+)
+
+type SceneMain struct {
+	// 继承基础场景
+	core.Scene
+	// 玩家
+	player *Player
+}
+
+var _ core.IObject = (*SceneMain)(nil)
+var _ core.IScene = (*SceneMain)(nil)
+
+func (s *SceneMain) Init() {
+	s.WorldSize = s.Game().GetScreenSize().Mul(3.0)
+	s.CameraPositon = s.WorldSize.Mul(0.5).Sub(s.Game().GetScreenSize().Mul(0.5))
+	s.player = &Player{}
+	s.player.Init()
+	s.player.SetPosition(s.WorldSize.Mul(0.5))
+}
+
+func (s *SceneMain) HandleEvent(event *sdl.Event) {
+}
+
+func (s *SceneMain) Update(dt float32) {
+	// 更新玩家
+	s.player.Update(dt)
+}
+
+func (s *SceneMain) Render() {
+	s.renderBackground()
+	// 渲染玩家
+	s.player.Render()
+}
+
+func (s *SceneMain) Clean() {
+	// 清理玩家
+	s.player.Clean()
+}
+
+// 非接口实现
+
+// 渲染背景
+func (s *SceneMain) renderBackground() {
+	// 背景绘制起始
+	start := s.WorldToScreen(mgl32.Vec2{0.0, 0.0})
+	// 背景绘制结束
+	end := s.WorldToScreen(s.WorldSize)
+	s.Game().DrawGrid(start, end, 80.0, sdl.FColor{R: 0.5, G: 0.5, B: 0.5, A: 1.0})
+	s.Game().DrawBoundary(start, end, 5.0, sdl.FColor{R: 1.0, G: 1.0, B: 1.0, A: 1.0})
+}
