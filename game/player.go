@@ -21,8 +21,7 @@ var _ core.IObjectScreen = (*Player)(nil)
 func (p *Player) Init() {
 	p.Actor.Init()
 	p.MaxSpeed = 500.0
-	// 添加精灵图子对象
-	affiliate.AddSpriteChild(p, "assets/sprite/ghost-idle.png", 0.5)
+	affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-idle.png", 2.0)
 }
 
 // 处理事件
@@ -44,7 +43,6 @@ func (p *Player) Update(dt float32) {
 // 渲染
 func (p *Player) Render() {
 	p.Actor.Render()
-	p.Game().DrawBoundary(p.RenderPosition, p.RenderPosition.Add(mgl32.Vec2{20.0, 20.0}), 5.0, sdl.FColor{R: 1.0, G: 0.0, B: 0.0, A: 1.0})
 }
 
 // 清理
