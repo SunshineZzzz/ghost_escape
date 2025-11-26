@@ -48,7 +48,7 @@ func (a *AssetStore) Clean() {
 }
 
 // 载入图片素材
-func (a *AssetStore) LoadImage(filePath string) error {
+func (a *AssetStore) loadImage(filePath string) error {
 	texture := img.LoadTexture(a.sdlRenderer, filePath)
 	if texture == nil {
 		return fmt.Errorf("load image error,%s", sdl.GetError())
@@ -58,7 +58,7 @@ func (a *AssetStore) LoadImage(filePath string) error {
 }
 
 // 载入声音素材
-func (a *AssetStore) LoadSound(filePath string) error {
+func (a *AssetStore) loadSound(filePath string) error {
 	sound, err := NewSound(filePath)
 	if err != nil {
 		return fmt.Errorf("load sound error,%s", err.Error())
@@ -68,7 +68,7 @@ func (a *AssetStore) LoadSound(filePath string) error {
 }
 
 // 载入字体素材
-func (a *AssetStore) LoadFont(filePath string, fontSize float32) error {
+func (a *AssetStore) loadFont(filePath string, fontSize float32) error {
 	font := ttf.OpenFont(filePath, fontSize)
 	if font == nil {
 		return fmt.Errorf("load font error,%s", sdl.GetError())
@@ -83,7 +83,7 @@ func (a *AssetStore) GetImage(filePath string) (*sdl.Texture, error) {
 	if ok {
 		return t, nil
 	}
-	err := a.LoadImage(filePath)
+	err := a.loadImage(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (a *AssetStore) GetSound(filePath string) (ISound, error) {
 	if ok {
 		return sound, nil
 	}
-	err := a.LoadSound(filePath)
+	err := a.loadSound(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (a *AssetStore) GetFont(filePath string, fontSize float32) (*ttf.Font, erro
 	if ok {
 		return font, nil
 	}
-	err := a.LoadFont(filePath, fontSize)
+	err := a.loadFont(filePath, fontSize)
 	if err != nil {
 		return nil, err
 	}

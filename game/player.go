@@ -1,6 +1,7 @@
 package game
 
 import (
+	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
@@ -20,6 +21,11 @@ var _ core.IObjectScreen = (*Player)(nil)
 func (p *Player) Init() {
 	p.Actor.Init()
 	p.MaxSpeed = 500.0
+	sprite := &affiliate.Sprite{}
+	sprite.Init()
+	sprite.SetTexture(core.CreateTexture("assets/sprite/ghost-idle.png"))
+	sprite.SetParent(p)
+	p.AddChild(sprite)
 }
 
 // 处理事件

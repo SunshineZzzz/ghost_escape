@@ -9,6 +9,8 @@ type IObjectScreen interface {
 	IObject
 	// 设置渲染(屏幕)位置
 	SetRenderPosition(mgl32.Vec2)
+	// 获取渲染(屏幕)位置
+	GetRenderPosition() mgl32.Vec2
 }
 
 // 基础屏幕对象
@@ -33,9 +35,9 @@ func (o *ObjectScreen) Init() {
 	o.ObjectType = ObjectTypeScreen
 }
 
-// 非接口实现
-
 // 获取渲染(屏幕)位置
 func (o *ObjectScreen) GetRenderPosition() mgl32.Vec2 {
 	return o.RenderPosition
 }
+
+// 非接口实现

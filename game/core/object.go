@@ -45,19 +45,35 @@ func (o *Object) Init() {
 }
 
 // 处理事件
-func (o *Object) HandleEvent(*sdl.Event) {
+func (o *Object) HandleEvent(event *sdl.Event) {
+	for e := o.Children.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).HandleEvent(event)
+	}
 }
 
 // 更新
-func (o *Object) Update(float32) {
+func (o *Object) Update(dt float32) {
+	for e := o.Children.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Update(dt)
+	}
 }
 
 // 渲染
 func (o *Object) Render() {
+	// 渲染子对象
+	for e := o.Children.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Render()
+	}
 }
 
 // 清理
 func (o *Object) Clean() {
+	// 清理子对象
+	for e := o.Children.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Clean()
+	}
+	// 清理自身
+	o.Children.Init()
 }
 
 // 增加孩子

@@ -217,3 +217,23 @@ func (g *Game) DrawBoundary(topLeft, bottomRight mgl32.Vec2, boundaryWidth float
 func (g *Game) GetCurrentScene() IScene {
 	return g.currentScene
 }
+
+// 获取资源管理器
+func (g *Game) GetAssetStore() *AssetStore {
+	return g.assetStore
+}
+
+// 渲染纹理
+func (g *Game) RenderTexture(texture *Texture, pos mgl32.Vec2, size mgl32.Vec2) {
+	dstRect := sdl.FRect{
+		X: pos.X(),
+		Y: pos.Y(),
+		W: size.X(),
+		H: size.Y(),
+	}
+	flipMode := sdl.FlipNone
+	if texture.IsFlip {
+		flipMode = sdl.FlipHorizontal
+	}
+	sdl.RenderTextureRotated(g.sdlRenderer, texture.Texture, &texture.SrcRect, &dstRect, texture.Angle, nil, flipMode)
+}
