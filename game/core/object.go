@@ -26,6 +26,10 @@ type IObject interface {
 	GetType() ObjectType
 	// 设置对象类型
 	SetType(ObjectType)
+	// 获取是否活跃
+	GetIsActive() bool
+	// 设置是否活跃
+	SetIsActive(bool)
 }
 
 // 基础对象
@@ -34,6 +38,8 @@ type Object struct {
 	ObjectType ObjectType
 	// 子对象列表
 	Children list.List
+	// 是否活跃
+	IsActive bool
 }
 
 var _ IObject = (*Object)(nil)
@@ -42,19 +48,24 @@ var _ IObject = (*Object)(nil)
 func (o *Object) Init() {
 	o.ObjectType = ObjectTypeNone
 	o.Children.Init()
+	o.IsActive = true
 }
 
 // 处理事件
 func (o *Object) HandleEvent(event *sdl.Event) {
 	for e := o.Children.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).HandleEvent(event)
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).HandleEvent(event)
+		}
 	}
 }
 
 // 更新
 func (o *Object) Update(dt float32) {
 	for e := o.Children.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).Update(dt)
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).Update(dt)
+		}
 	}
 }
 
@@ -62,7 +73,9 @@ func (o *Object) Update(dt float32) {
 func (o *Object) Render() {
 	// 渲染子对象
 	for e := o.Children.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).Render()
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).Render()
+		}
 	}
 }
 
@@ -98,6 +111,16 @@ func (o *Object) GetType() ObjectType {
 // 设置对象类型
 func (o *Object) SetType(t ObjectType) {
 	o.ObjectType = t
+}
+
+// 获取是否活跃
+func (o *Object) GetIsActive() bool {
+	return o.IsActive
+}
+
+// 设置是否活跃
+func (o *Object) SetIsActive(active bool) {
+	o.IsActive = active
 }
 
 // 非接口实现

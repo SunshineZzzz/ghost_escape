@@ -23,13 +23,14 @@ type SpriteAnim struct {
 var _ core.IObject = (*Sprite)(nil)
 var _ ISprite = (*Sprite)(nil)
 
-func AddSpriteAnimChild(parent core.IObjectScreen, filePath string, scale float32) {
+func AddSpriteAnimChild(parent core.IObjectScreen, filePath string, scale float32) *SpriteAnim {
 	child := &SpriteAnim{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))
 	child.SetScale(scale)
 	child.SetParent(parent)
 	parent.AddChild(child)
+	return child
 }
 
 // 初始化
@@ -61,4 +62,44 @@ func (s *SpriteAnim) SetTexture(texture *core.Texture) {
 	s.totalFrame = texture.SrcRect.W / texture.SrcRect.H
 	texture.SrcRect.W = texture.SrcRect.H
 	s.Size = mgl32.Vec2{texture.SrcRect.W, texture.SrcRect.H}
+}
+
+// 获取当前帧
+func (s *SpriteAnim) GetCurrentFrame() float32 {
+	return s.currentFrame
+}
+
+// 设置当前帧
+func (s *SpriteAnim) SetCurrentFrame(frame float32) {
+	s.currentFrame = frame
+}
+
+// 获取总帧数
+func (s *SpriteAnim) GetTotalFrame() float32 {
+	return s.totalFrame
+}
+
+// 设置总帧数
+func (s *SpriteAnim) SetTotalFrame(totalFrame float32) {
+	s.totalFrame = totalFrame
+}
+
+// 获取帧率
+func (s *SpriteAnim) GetFps() float32 {
+	return s.fps
+}
+
+// 设置帧率
+func (s *SpriteAnim) SetFps(fps float32) {
+	s.fps = fps
+}
+
+// 获取动画帧计时器
+func (s *SpriteAnim) GetFrameTimer() float32 {
+	return s.frameTimer
+}
+
+// 设置动画帧计时器
+func (s *SpriteAnim) SetFrameTimer(frameTimer float32) {
+	s.frameTimer = frameTimer
 }
