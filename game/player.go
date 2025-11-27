@@ -5,7 +5,6 @@ import (
 	"ghost_escape/game/core"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
-	"github.com/go-gl/mathgl/mgl32"
 )
 
 // 玩家
@@ -29,8 +28,8 @@ func (p *Player) Init() {
 	p.MaxSpeed = 500.0
 	p.spriteIdleAnim = affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-idle.png", 2.0)
 	p.spriteMoveAnim = affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-move.png", 2.0)
-	p.spriteIdleAnim.SetIsActive(true)
-	p.spriteMoveAnim.SetIsActive(false)
+	p.spriteIdleAnim.SetActive(true)
+	p.spriteMoveAnim.SetActive(false)
 	p.isMoving = false
 }
 
@@ -45,7 +44,7 @@ func (p *Player) Update(dt float32) {
 	// 速度慢慢减速
 	p.Velocity = p.Velocity.Mul(0.9)
 	p.keyboardControl()
-	p.move(dt)
+	p.Move(dt)
 	p.checkState()
 	p.syncCamera()
 }
@@ -79,15 +78,6 @@ func (p *Player) keyboardControl() {
 	}
 }
 
-// 移动
-func (p *Player) move(dt float32) {
-	newPos := p.Position.Add(p.Velocity.Mul(dt))
-	p.Position[0] = mgl32.Clamp(newPos.X(), 0.0, p.Game().GetWorldSize().X())
-	p.Position[1] = mgl32.Clamp(newPos.Y(), 0.0, p.Game().GetWorldSize().Y())
-	p.SetPosition(p.Position)
-	// fmt.Printf("dt: %f, pos: %v, vel: %v\n", dt, p.Position, p.Velocity)
-}
-
 // 同步相机
 func (p *Player) syncCamera() {
 	// 相机跟着玩家一起移动
@@ -113,13 +103,13 @@ func (p *Player) checkState() {
 // 切换状态
 func (p *Player) changeState() {
 	if p.isMoving {
-		p.spriteIdleAnim.SetIsActive(false)
-		p.spriteMoveAnim.SetIsActive(true)
+		p.spriteIdleAnim.SetActive(false)
+		p.spriteMoveAnim.SetActive(true)
 		p.spriteMoveAnim.SetFrameTimer(p.spriteIdleAnim.GetCurrentFrame())
 		p.spriteMoveAnim.SetCurrentFrame(p.spriteIdleAnim.GetCurrentFrame())
 	} else {
-		p.spriteIdleAnim.SetIsActive(true)
-		p.spriteMoveAnim.SetIsActive(false)
+		p.spriteIdleAnim.SetActive(true)
+		p.spriteMoveAnim.SetActive(false)
 		p.spriteIdleAnim.SetFrameTimer(p.spriteMoveAnim.GetCurrentFrame())
 		p.spriteIdleAnim.SetCurrentFrame(p.spriteMoveAnim.GetCurrentFrame())
 	}

@@ -29,7 +29,11 @@ type IObject interface {
 	// 获取是否活跃
 	GetIsActive() bool
 	// 设置是否活跃
-	SetIsActive(bool)
+	SetActive(bool)
+	// 获取是否需要移除
+	GetNeedRemove() bool
+	// 设置是否需要移除
+	SetNeedRemove(bool)
 }
 
 // 基础对象
@@ -40,6 +44,8 @@ type Object struct {
 	Children list.List
 	// 是否活跃
 	IsActive bool
+	// 是否需要移除
+	NeedRemove bool
 }
 
 var _ IObject = (*Object)(nil)
@@ -49,6 +55,7 @@ func (o *Object) Init() {
 	o.ObjectType = ObjectTypeNone
 	o.Children.Init()
 	o.IsActive = true
+	o.NeedRemove = false
 }
 
 // 处理事件
@@ -62,10 +69,16 @@ func (o *Object) HandleEvent(event *sdl.Event) {
 
 // 更新
 func (o *Object) Update(dt float32) {
-	for e := o.Children.Front(); e != nil; e = e.Next() {
+	for e := o.Children.Front(); e != nil; {
+		next := e.Next()
+		if e.Value.(IObject).GetNeedRemove() {
+			o.Children.Remove(e)
+			e.Value.(IObject).SetActive(false)
+		}
 		if e.Value.(IObject).GetIsActive() {
 			e.Value.(IObject).Update(dt)
 		}
+		e = next
 	}
 }
 
@@ -119,8 +132,18 @@ func (o *Object) GetIsActive() bool {
 }
 
 // 设置是否活跃
-func (o *Object) SetIsActive(active bool) {
+func (o *Object) SetActive(active bool) {
 	o.IsActive = active
+}
+
+// 获取是否需要移除
+func (o *Object) GetNeedRemove() bool {
+	return o.NeedRemove
+}
+
+// 设置是否需要移除
+func (o *Object) SetNeedRemove(needRemove bool) {
+	o.NeedRemove = needRemove
 }
 
 // 非接口实现

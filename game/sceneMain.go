@@ -23,6 +23,12 @@ func (s *SceneMain) Init() {
 	player.Init()
 	player.SetPosition(s.WorldSize.Mul(0.5))
 	s.AddChild(player)
+
+	enemy := &Enemy{}
+	enemy.Init()
+	enemy.SetTarget(player)
+	enemy.SetPosition(s.WorldSize.Mul(0.5).Add(mgl32.Vec2{200.0, 200.0}))
+	s.AddChild(enemy)
 }
 
 func (s *SceneMain) HandleEvent(event *sdl.Event) {

@@ -71,21 +71,41 @@ func (s *Scene) Init() {
 func (s *Scene) HandleEvent(event *sdl.Event) {
 	s.Object.HandleEvent(event)
 	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).HandleEvent(event)
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).HandleEvent(event)
+		}
 	}
 	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).HandleEvent(event)
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).HandleEvent(event)
+		}
 	}
 }
 
 // 更新
 func (s *Scene) Update(dt float32) {
 	s.Object.Update(dt)
-	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).Update(dt)
+	for e := s.ChildrenWorld.Front(); e != nil; {
+		next := e.Next()
+		if e.Value.(IObject).GetNeedRemove() {
+			s.ChildrenWorld.Remove(e)
+			e.Value.(IObject).SetActive(false)
+		}
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).Update(dt)
+		}
+		e = next
 	}
-	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).Update(dt)
+	for e := s.ChildrenScreen.Front(); e != nil; {
+		next := e.Next()
+		if e.Value.(IObject).GetNeedRemove() {
+			s.ChildrenScreen.Remove(e)
+			e.Value.(IObject).SetActive(false)
+		}
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).Update(dt)
+		}
+		e = next
 	}
 }
 
@@ -93,10 +113,14 @@ func (s *Scene) Update(dt float32) {
 func (s *Scene) Render() {
 	s.Object.Render()
 	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).Render()
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).Render()
+		}
 	}
 	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
-		e.Value.(IObject).Render()
+		if e.Value.(IObject).GetIsActive() {
+			e.Value.(IObject).Render()
+		}
 	}
 }
 

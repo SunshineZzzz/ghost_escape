@@ -18,6 +18,10 @@ type SpriteAnim struct {
 	currentFrame float32
 	// 动画帧计时器
 	frameTimer float32
+	// 是否循环播放
+	loop bool
+	// 是否播放完毕
+	isFinish bool
 }
 
 var _ core.IObject = (*Sprite)(nil)
@@ -37,10 +41,16 @@ func AddSpriteAnimChild(parent core.IObjectScreen, filePath string, scale float3
 func (s *SpriteAnim) Init() {
 	s.Sprite.Init()
 	s.fps = 10.0
+	s.loop = true
+	s.isFinish = false
 }
 
 // 更新
 func (s *SpriteAnim) Update(dt float32) {
+	if s.isFinish {
+		return
+	}
+
 	s.Sprite.Update(dt)
 	s.frameTimer += dt
 	// 动画帧计时器超过播放一帧所需的时间时，切换到下一帧
@@ -49,6 +59,11 @@ func (s *SpriteAnim) Update(dt float32) {
 		// 当前帧超过总帧数时，重置当前帧为0
 		if s.currentFrame >= s.totalFrame {
 			s.currentFrame = 0.0
+			// 如果不是循环播放，标记为播放完毕
+			if !s.loop {
+				s.isFinish = true
+				return
+			}
 		}
 		// 重置动画帧计时器
 		s.frameTimer = 0.0
@@ -102,4 +117,24 @@ func (s *SpriteAnim) GetFrameTimer() float32 {
 // 设置动画帧计时器
 func (s *SpriteAnim) SetFrameTimer(frameTimer float32) {
 	s.frameTimer = frameTimer
+}
+
+// 获取是否循环播放
+func (s *SpriteAnim) GetLoop() bool {
+	return s.loop
+}
+
+// 设置是否循环播放
+func (s *SpriteAnim) SetLoop(loop bool) {
+	s.loop = loop
+}
+
+// 获取是否播放完毕
+func (s *SpriteAnim) GetFinish() bool {
+	return s.isFinish
+}
+
+// 设置是否播放完毕
+func (s *SpriteAnim) SetFinish(finish bool) {
+	s.isFinish = finish
 }

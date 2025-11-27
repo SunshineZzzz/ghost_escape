@@ -17,6 +17,12 @@ type Actor struct {
 var _ IObject = (*Actor)(nil)
 var _ IObjectScreen = (*Actor)(nil)
 
+// 初始化
+func (a *Actor) Init() {
+	a.ObjectWorld.Init()
+	a.MaxSpeed = 100.0
+}
+
 // 非接口实现
 
 // 设置速度
@@ -37,4 +43,13 @@ func (a *Actor) SetMaxSpeed(speed float32) {
 // 获取最大速度大小
 func (a *Actor) GetMaxSpeed() float32 {
 	return a.MaxSpeed
+}
+
+// 移动
+func (a *Actor) Move(dt float32) {
+	newPos := a.Position.Add(a.Velocity.Mul(dt))
+	a.Position[0] = mgl32.Clamp(newPos.X(), 0.0, a.Game().GetWorldSize().X())
+	a.Position[1] = mgl32.Clamp(newPos.Y(), 0.0, a.Game().GetWorldSize().Y())
+	a.SetPosition(a.Position)
+	// fmt.Printf("dt: %f, pos: %v, vel: %v\n", dt, a.Position, a.Velocity)
 }
