@@ -9,7 +9,7 @@ type ObjectAffiliate struct {
 	// 继承基础对象
 	Object
 	// 父节点
-	Parent IObjectScreen
+	Parent IObjectWorld
 	// 相对父节点偏移
 	Offset mgl32.Vec2
 	// 大小
@@ -26,12 +26,12 @@ func (o *ObjectAffiliate) Init() {
 // 非接口实现
 
 // 获取父节点
-func (o *ObjectAffiliate) GetParent() IObjectScreen {
+func (o *ObjectAffiliate) GetParent() IObjectWorld {
 	return o.Parent
 }
 
 // 设置父亲节点
-func (o *ObjectAffiliate) SetParent(parent IObjectScreen) {
+func (o *ObjectAffiliate) SetParent(parent IObjectWorld) {
 	o.Parent = parent
 }
 

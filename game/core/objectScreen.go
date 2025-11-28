@@ -6,6 +6,7 @@ import (
 
 // 屏幕对象抽象
 type IObjectScreen interface {
+	// 继承基础对象接口
 	IObject
 	// 设置渲染(屏幕)位置
 	SetRenderPosition(mgl32.Vec2)

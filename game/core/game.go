@@ -231,9 +231,46 @@ func (g *Game) RenderTexture(texture *Texture, pos mgl32.Vec2, size mgl32.Vec2) 
 		W: size.X(),
 		H: size.Y(),
 	}
+	screenRect := sdl.FRect{
+		X: 0.0,
+		Y: 0.0,
+		W: g.screenSize.X(),
+		H: g.screenSize.Y(),
+	}
+	intersectionRect, ok := sdl.GetRectIntersectionFloat(screenRect, dstRect)
+	if !ok {
+		return
+	}
 	flipMode := sdl.FlipNone
 	if texture.IsFlip {
 		flipMode = sdl.FlipHorizontal
 	}
-	sdl.RenderTextureRotated(g.sdlRenderer, texture.Texture, &texture.SrcRect, &dstRect, texture.Angle, nil, flipMode)
+	sdl.RenderTextureRotated(g.sdlRenderer, texture.Texture, &texture.SrcRect, &intersectionRect, texture.Angle, nil, flipMode)
+}
+
+// 绘制填充圆，并不是画圆，而是用绘制圆形纹理，目的是可视化碰撞器
+func (g *Game) RenderFillCircle(pos mgl32.Vec2, size mgl32.Vec2, alpha float32) {
+	dstRect := sdl.FRect{
+		X: pos.X(),
+		Y: pos.Y(),
+		W: size.X(),
+		H: size.Y(),
+	}
+	screenRect := sdl.FRect{
+		X: 0.0,
+		Y: 0.0,
+		W: g.screenSize.X(),
+		H: g.screenSize.Y(),
+	}
+	intersectionRect, ok := sdl.GetRectIntersectionFloat(screenRect, dstRect)
+	if !ok {
+		return
+	}
+	texture, err := g.assetStore.GetImage("assets/UI/circle.png")
+	if err != nil {
+		return
+	}
+	sdl.SetTextureAlphaModFloat(texture, alpha)
+	sdl.RenderTexture(g.sdlRenderer, texture, nil, &intersectionRect)
+
 }

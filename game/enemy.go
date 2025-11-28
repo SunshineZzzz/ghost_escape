@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
 )
@@ -33,8 +34,6 @@ type Enemy struct {
 	spriteAnimDead *affiliate.SpriteAnim
 	// 当前精灵动画
 	currentSpriteAnim *affiliate.SpriteAnim
-	// 暂时测试用的
-	timer float32
 }
 
 var _ core.IObject = (*Enemy)(nil)
@@ -52,6 +51,7 @@ func (e *Enemy) Init() {
 	e.spriteAnimDead.SetActive(false)
 	e.spriteAnimDead.SetLoop(false)
 	e.currentSpriteAnim = e.spriteAnimNormal
+	e.Collider = affiliate.AddColliderChild(e, e.currentSpriteAnim.GetSize(), core.ColliderTypeCircle)
 }
 
 // 更新
@@ -59,14 +59,7 @@ func (e *Enemy) Update(dt float32) {
 	e.Actor.Update(dt)
 	e.aimTarget(e.target)
 	e.Move(dt)
-	e.timer += dt
-	if e.timer > 1.0 && e.timer < 2.0 {
-		e.changeState(EnemyStateHurt)
-	} else if e.timer > 2.0 && e.timer < 3.0 {
-		e.changeState(EnemyStateDead)
-	} else {
-		e.Remove()
-	}
+	e.Attack()
 }
 
 // 非接口实现
@@ -113,5 +106,15 @@ func (e *Enemy) changeState(newState EnemyState) {
 func (e *Enemy) Remove() {
 	if e.currentSpriteAnim.GetFinish() {
 		e.SetNeedRemove(true)
+	}
+}
+
+// 攻击
+func (e *Enemy) Attack() {
+	if e.target == nil {
+		return
+	}
+	if e.Collider.IsColliding(e.target.GetCollider()) {
+		fmt.Println("敌人攻击玩家")
 	}
 }

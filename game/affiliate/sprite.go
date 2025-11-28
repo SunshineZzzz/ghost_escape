@@ -20,7 +20,7 @@ type ISprite interface {
 	GetAngle() float64
 }
 
-// 精灵图
+// 精灵图组件
 type Sprite struct {
 	// 继承基础依附对象
 	core.ObjectAffiliate
@@ -32,7 +32,7 @@ var _ core.IObject = (*Sprite)(nil)
 var _ ISprite = (*Sprite)(nil)
 
 // 添加精灵图子对象
-func AddSpriteChild(parent core.IObjectScreen, filePath string, scale float32) *Sprite {
+func AddSpriteChild(parent core.IObjectWorld, filePath string, scale float32) *Sprite {
 	child := &Sprite{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))

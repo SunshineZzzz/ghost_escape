@@ -31,6 +31,7 @@ func (p *Player) Init() {
 	p.spriteIdleAnim.SetActive(true)
 	p.spriteMoveAnim.SetActive(false)
 	p.isMoving = false
+	p.Collider = affiliate.AddColliderChild(p, p.spriteIdleAnim.GetSize(), core.ColliderTypeCircle)
 }
 
 // 处理事件

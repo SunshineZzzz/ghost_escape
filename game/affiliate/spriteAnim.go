@@ -6,7 +6,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// 精灵图动画
+// 精灵图动画组件
 type SpriteAnim struct {
 	// 继承精灵图
 	Sprite
@@ -27,7 +27,7 @@ type SpriteAnim struct {
 var _ core.IObject = (*Sprite)(nil)
 var _ ISprite = (*Sprite)(nil)
 
-func AddSpriteAnimChild(parent core.IObjectScreen, filePath string, scale float32) *SpriteAnim {
+func AddSpriteAnimChild(parent core.IObjectWorld, filePath string, scale float32) *SpriteAnim {
 	child := &SpriteAnim{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))
