@@ -40,7 +40,9 @@ func AddStatusChild(parent *Actor, maxHealth, maxMana, damage, manaRegenSpeed fl
 	stats.Mana = maxMana
 	stats.ManaRegenSpeed = manaRegenSpeed
 	stats.Damage = damage
-	parent.AddChild(stats)
+	if parent != nil {
+		parent.AddChild(stats)
+	}
 	return stats
 }
 
