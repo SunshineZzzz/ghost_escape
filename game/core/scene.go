@@ -14,6 +14,8 @@ type IScene interface {
 	WorldToScreen(mgl32.Vec2) mgl32.Vec2
 	// 屏幕坐标转换为世界坐标
 	ScreenToWorld(mgl32.Vec2) mgl32.Vec2
+	// 获取摄像机位置
+	GetCameraPosition() mgl32.Vec2
 	// 设置摄像机位置
 	SetCameraPosition(mgl32.Vec2)
 	// 获取世界大小
@@ -47,6 +49,11 @@ func (s *Scene) WorldToScreen(worldPosition mgl32.Vec2) mgl32.Vec2 {
 func (s *Scene) ScreenToWorld(screenPosition mgl32.Vec2) mgl32.Vec2 {
 	// 屏幕坐标+摄像机位置=世界坐标
 	return screenPosition.Add(s.CameraPositon)
+}
+
+// 获取摄像机位置(世界坐标系)
+func (s *Scene) GetCameraPosition() mgl32.Vec2 {
+	return s.CameraPositon
 }
 
 // 设置摄像机位置(世界坐标系)

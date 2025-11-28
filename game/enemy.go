@@ -3,6 +3,8 @@ package game
 import (
 	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 // 敌人状态
@@ -37,6 +39,18 @@ type Enemy struct {
 
 var _ core.IObject = (*Enemy)(nil)
 var _ core.IObjectScreen = (*Enemy)(nil)
+
+// 创建敌人
+func CreateEnemy(parent core.IObject, pos mgl32.Vec2, target *Player) *Enemy {
+	enemy := &Enemy{}
+	enemy.Init()
+	enemy.SetPosition(pos)
+	enemy.SetTarget(target)
+	if parent != nil {
+		parent.AddChild(enemy)
+	}
+	return enemy
+}
 
 // 初始化
 func (e *Enemy) Init() {

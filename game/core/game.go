@@ -2,7 +2,9 @@ package core
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
 	"github.com/SunshineZzzz/purego-sdl3/ttf"
@@ -34,6 +36,8 @@ func GetInstance() *Game {
 }
 
 type Game struct {
+	// 随机数生成器
+	rand *rand.Rand
 	// 资源管理器
 	assetStore *AssetStore
 	// 屏幕大小
@@ -56,6 +60,7 @@ type Game struct {
 
 func (g *Game) Init(title string, width, height int32, scene IScene) error {
 	g.screenSize = mgl32.Vec2{float32(width), float32(height)}
+	g.rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// 初始化 SDL
 	if !sdl.Init(sdl.InitVideo | sdl.InitAudio | sdl.InitEvents) {
@@ -272,5 +277,22 @@ func (g *Game) RenderFillCircle(pos mgl32.Vec2, size mgl32.Vec2, alpha float32) 
 	}
 	sdl.SetTextureAlphaModFloat(texture, alpha)
 	sdl.RenderTexture(g.sdlRenderer, texture, nil, &intersectionRect)
+}
 
+// 随机min和max范围的浮点数
+func (g *Game) RandFloat32(min, max float32) float32 {
+	return min + g.rand.Float32()*(max-min)
+}
+
+// 随机min和max范围的整数
+func (g *Game) RandInt(min, max int) int {
+	return min + g.rand.Int()*(max-min)
+}
+
+// 随机min和max范围的Vec2
+func (g *Game) RandVec2(min, max mgl32.Vec2) mgl32.Vec2 {
+	return mgl32.Vec2{
+		g.RandFloat32(min.X(), max.X()),
+		g.RandFloat32(min.Y(), max.Y()),
+	}
 }

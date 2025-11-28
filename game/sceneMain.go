@@ -1,7 +1,6 @@
 package game
 
 import (
-	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
@@ -11,6 +10,8 @@ import (
 type SceneMain struct {
 	// 继承基础场景
 	core.Scene
+	// 生成器
+	spawner *Spawner
 }
 
 var _ core.IObject = (*SceneMain)(nil)
@@ -27,15 +28,22 @@ func (s *SceneMain) Init() {
 	player.SetPosition(s.WorldSize.Mul(0.5))
 	s.AddChild(player)
 
-	// 敌人
-	enemy := &Enemy{}
-	enemy.Init()
-	enemy.SetTarget(player)
-	enemy.SetPosition(s.WorldSize.Mul(0.5).Add(mgl32.Vec2{200.0, 200.0}))
-	// 敌人产生是从特效精灵动画结束后产生，所以这里生成特效精灵动画
-	SpriteAnim := affiliate.CteateSpriteAnimChild("assets/effect/184_3.png", 1.0, core.AnchorTypeCenter)
-	// 上面的特效加载到场景中
-	core.AddEffect(s, SpriteAnim, enemy.GetPosition(), enemy)
+	// 生成器
+	spawner := &Spawner{}
+	spawner.Init()
+	spawner.SetTarget(player)
+	s.spawner = spawner
+	s.AddChild(spawner)
+
+	// // 敌人
+	// enemy := &Enemy{}
+	// enemy.Init()
+	// enemy.SetTarget(player)
+	// enemy.SetPosition(s.WorldSize.Mul(0.5).Add(mgl32.Vec2{200.0, 200.0}))
+	// // 敌人产生是从特效精灵动画结束后产生，所以这里生成特效精灵动画
+	// SpriteAnim := affiliate.CteateSpriteAnimChild("assets/effect/184_3.png", 1.0, core.AnchorTypeCenter)
+	// // 上面的特效加载到场景中
+	// core.AddEffect(s, SpriteAnim, enemy.GetPosition(), enemy)
 }
 
 func (s *SceneMain) HandleEvent(event *sdl.Event) {
