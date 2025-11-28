@@ -312,3 +312,38 @@ func (g *Game) GetMousePosition() mgl32.Vec2 {
 func (g *Game) GetMouseButtons() sdl.MouseButtonFlags {
 	return g.mouseButtons
 }
+
+// 绘制水平进度条
+func (g *Game) RenderHBar(pos mgl32.Vec2, size mgl32.Vec2, percent float32, color sdl.FColor) {
+	boundaryRect := sdl.FRect{
+		X: pos.X(),
+		Y: pos.Y(),
+		W: size.X(),
+		H: size.Y(),
+	}
+	fillRect := sdl.FRect{
+		X: pos.X(),
+		Y: pos.Y(),
+		W: size.X() * percent,
+		H: size.Y(),
+	}
+	screenRect := sdl.FRect{
+		X: 0.0,
+		Y: 0.0,
+		W: g.screenSize.X(),
+		H: g.screenSize.Y(),
+	}
+	intersectionRect1, ok1 := sdl.GetRectIntersectionFloat(screenRect, boundaryRect)
+	intersectionRect2, ok2 := sdl.GetRectIntersectionFloat(screenRect, fillRect)
+	if !ok1 && !ok2 {
+		return
+	}
+	sdl.SetRenderDrawColorFloat(g.sdlRenderer, color.R, color.G, color.B, color.A)
+	if ok1 {
+		sdl.RenderRect(g.sdlRenderer, &intersectionRect1)
+	}
+	if ok2 {
+		sdl.RenderFillRect(g.sdlRenderer, &intersectionRect2)
+	}
+	sdl.SetRenderDrawColorFloat(g.sdlRenderer, 0.0, 0.0, 0.0, 1.0)
+}

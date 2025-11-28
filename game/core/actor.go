@@ -14,6 +14,8 @@ type Actor struct {
 	MaxSpeed float32
 	// 角色属性组件
 	Stats *Stats
+	// 血条组件
+	HealthBar IObjectAffiliate
 }
 
 var _ IObject = (*Actor)(nil)
@@ -23,6 +25,12 @@ var _ IObjectScreen = (*Actor)(nil)
 func (a *Actor) Init() {
 	a.ObjectWorld.Init()
 	a.MaxSpeed = 100.0
+}
+
+// 更新
+func (a *Actor) Update(dt float32) {
+	a.ObjectWorld.Update(dt)
+	a.updateHealthBar()
 }
 
 // 非接口实现
@@ -79,4 +87,13 @@ func (a *Actor) GetAlive() bool {
 		return false
 	}
 	return a.Stats.GetAlive()
+}
+
+// 更新血条
+func (a *Actor) updateHealthBar() {
+	if a.Stats == nil || a.HealthBar == nil {
+		return
+	}
+	// 更新血条
+	a.HealthBar.SetPercent(a.Stats.GetHealth() / a.Stats.GetMaxHealth())
 }

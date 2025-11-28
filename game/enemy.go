@@ -66,6 +66,9 @@ func (e *Enemy) Init() {
 	e.currentSpriteAnim = e.spriteAnimNormal
 	e.Collider = affiliate.AddColliderChild(e, e.currentSpriteAnim.GetSize(), core.ColliderTypeCircle, core.AnchorTypeCenter)
 	e.Stats = core.AddStatusChild(&e.Actor, 100.0, 100.0, 40.0, 10.0)
+	size := e.spriteAnimNormal.GetSize()
+	e.HealthBar = affiliate.AddAffiliateBarChild(e, mgl32.Vec2{size.X() - 10, 10.0}, core.AnchorTypeCenter)
+	e.HealthBar.SetOffset(e.HealthBar.GetOffset().Add(mgl32.Vec2{0.0, size.Y() / 2}))
 	e.SetType(core.ObjectTypeEnemy)
 }
 

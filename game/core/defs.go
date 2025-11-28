@@ -14,7 +14,7 @@ const (
 	ObjectTypeEnemy
 )
 
-// 锚点布局定义
+// 锚点布局定义，用于确定父亲的位置
 type AnchorType int
 
 const (
