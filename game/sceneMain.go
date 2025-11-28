@@ -1,6 +1,7 @@
 package game
 
 import (
+	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
@@ -19,16 +20,22 @@ func (s *SceneMain) Init() {
 	s.Scene.Init()
 	s.WorldSize = s.Game().GetScreenSize().Mul(3.0)
 	s.CameraPositon = s.WorldSize.Mul(0.5).Sub(s.Game().GetScreenSize().Mul(0.5))
+
+	// 玩家
 	player := &Player{}
 	player.Init()
 	player.SetPosition(s.WorldSize.Mul(0.5))
 	s.AddChild(player)
 
+	// 敌人
 	enemy := &Enemy{}
 	enemy.Init()
 	enemy.SetTarget(player)
 	enemy.SetPosition(s.WorldSize.Mul(0.5).Add(mgl32.Vec2{200.0, 200.0}))
-	s.AddChild(enemy)
+	// 敌人产生是从特效精灵动画结束后产生，所以这里生成特效精灵动画
+	SpriteAnim := affiliate.CteateSpriteAnimChild("assets/effect/184_3.png", 1.0, core.AnchorTypeCenter)
+	// 上面的特效加载到场景中
+	core.AddEffect(s, SpriteAnim, enemy.GetPosition(), enemy)
 }
 
 func (s *SceneMain) HandleEvent(event *sdl.Event) {

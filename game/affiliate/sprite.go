@@ -30,6 +30,7 @@ type Sprite struct {
 
 var _ core.IObject = (*Sprite)(nil)
 var _ ISprite = (*Sprite)(nil)
+var _ core.IObjectAffiliate = (*Sprite)(nil)
 
 // 添加精灵图子对象
 func AddSpriteChild(parent core.IObjectWorld, filePath string, scale float32, anchorType core.AnchorType) *Sprite {

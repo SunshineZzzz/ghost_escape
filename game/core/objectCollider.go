@@ -48,6 +48,7 @@ type ObjectCollider struct {
 
 var _ IObject = (*ObjectCollider)(nil)
 var _ IObjectCollider = (*ObjectCollider)(nil)
+var _ IObjectAffiliate = (*ObjectCollider)(nil)
 
 // 获取碰撞器类型
 func (o *ObjectCollider) GetColliderType() ColliderType {

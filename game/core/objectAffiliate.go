@@ -4,6 +4,30 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// 基础依附对象抽象
+type IObjectAffiliate interface {
+	// 继承基础对象接口
+	IObject
+	// 获取父节点
+	GetParent() IObjectWorld
+	// 设置父亲节点
+	SetParent(IObjectWorld)
+	// 获取相对父节点偏移
+	GetOffset() mgl32.Vec2
+	// 设置相对父节点偏移
+	SetOffset(mgl32.Vec2)
+	// 获取大小
+	GetSize() mgl32.Vec2
+	// 设置大小
+	SetSize(mgl32.Vec2)
+	// 设置缩放比例
+	SetScale(float32)
+	// 获取锚点布局类型
+	GetAnchorType() AnchorType
+	// 设置锚点布局类型
+	SetAnchorType(AnchorType)
+}
+
 // 基础依附对象
 type ObjectAffiliate struct {
 	// 继承基础对象
@@ -19,14 +43,13 @@ type ObjectAffiliate struct {
 }
 
 var _ IObject = (*ObjectAffiliate)(nil)
+var _ IObjectAffiliate = (*ObjectAffiliate)(nil)
 
 // 初始化
 func (o *ObjectAffiliate) Init() {
 	o.Object.Init()
 	o.AnchorType = AnchorTypeCenter
 }
-
-// 非接口实现
 
 // 获取父节点
 func (o *ObjectAffiliate) GetParent() IObjectWorld {
@@ -100,3 +123,5 @@ func (o *ObjectAffiliate) SetOffsetByAnchorType(anchor AnchorType) {
 		o.Offset = mgl32.Vec2{0, 0}
 	}
 }
+
+// 非接口实现

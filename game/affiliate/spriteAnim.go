@@ -24,9 +24,12 @@ type SpriteAnim struct {
 	isFinish bool
 }
 
-var _ core.IObject = (*Sprite)(nil)
-var _ ISprite = (*Sprite)(nil)
+var _ core.IObject = (*SpriteAnim)(nil)
+var _ ISprite = (*SpriteAnim)(nil)
+var _ core.IObjectAnima = (*SpriteAnim)(nil)
+var _ core.IObjectAffiliate = (*SpriteAnim)(nil)
 
+// 添加精灵图动画组件到父对象中
 func AddSpriteAnimChild(parent core.IObjectWorld, filePath string, scale float32, anchorType core.AnchorType) *SpriteAnim {
 	child := &SpriteAnim{}
 	child.Init()
@@ -35,6 +38,16 @@ func AddSpriteAnimChild(parent core.IObjectWorld, filePath string, scale float32
 	child.SetParent(parent)
 	child.SetAnchorType(anchorType)
 	parent.AddChild(child)
+	return child
+}
+
+// 创建精灵图动画组件
+func CteateSpriteAnimChild(filePath string, scale float32, anchorType core.AnchorType) *SpriteAnim {
+	child := &SpriteAnim{}
+	child.Init()
+	child.SetTexture(core.CreateTexture(filePath))
+	child.SetScale(scale)
+	child.SetAnchorType(anchorType)
 	return child
 }
 
@@ -70,14 +83,6 @@ func (s *SpriteAnim) Update(dt float32) {
 		s.frameTimer = 0.0
 	}
 	s.Texture.SrcRect.X = s.Texture.SrcRect.W * s.currentFrame
-}
-
-// 设置纹理
-func (s *SpriteAnim) SetTexture(texture *core.Texture) {
-	s.Texture = texture
-	s.totalFrame = texture.SrcRect.W / texture.SrcRect.H
-	texture.SrcRect.W = texture.SrcRect.H
-	s.Size = mgl32.Vec2{texture.SrcRect.W, texture.SrcRect.H}
 }
 
 // 获取当前帧
@@ -138,4 +143,14 @@ func (s *SpriteAnim) GetFinish() bool {
 // 设置是否播放完毕
 func (s *SpriteAnim) SetFinish(finish bool) {
 	s.isFinish = finish
+}
+
+// 非接口实现
+
+// 设置纹理
+func (s *SpriteAnim) SetTexture(texture *core.Texture) {
+	s.Texture = texture
+	s.totalFrame = texture.SrcRect.W / texture.SrcRect.H
+	texture.SrcRect.W = texture.SrcRect.H
+	s.Size = mgl32.Vec2{texture.SrcRect.W, texture.SrcRect.H}
 }

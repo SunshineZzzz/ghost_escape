@@ -34,6 +34,8 @@ type IObject interface {
 	GetNeedRemove() bool
 	// 设置是否需要移除
 	SetNeedRemove(bool)
+	// 安全加入孩子
+	SafeAddChild(child IObject)
 }
 
 // 基础对象
@@ -42,6 +44,8 @@ type Object struct {
 	ObjectType ObjectType
 	// 子对象列表
 	Children list.List
+	// 等待加入场景的子对象列表
+	ChildrenToAdd list.List
 	// 是否活跃
 	IsActive bool
 	// 是否需要移除
@@ -54,6 +58,7 @@ var _ IObject = (*Object)(nil)
 func (o *Object) Init() {
 	o.ObjectType = ObjectTypeNone
 	o.Children.Init()
+	o.ChildrenToAdd.Init()
 	o.IsActive = true
 	o.NeedRemove = false
 }
@@ -69,6 +74,13 @@ func (o *Object) HandleEvent(event *sdl.Event) {
 
 // 更新
 func (o *Object) Update(dt float32) {
+	for e := o.ChildrenToAdd.Front(); e != nil; {
+		next := e.Next()
+		o.Children.PushBack(e.Value)
+		o.ChildrenToAdd.Remove(e)
+		e = next
+	}
+	o.ChildrenToAdd.Init()
 	for e := o.Children.Front(); e != nil; {
 		next := e.Next()
 		if e.Value.(IObject).GetNeedRemove() {
@@ -98,7 +110,12 @@ func (o *Object) Clean() {
 	for e := o.Children.Front(); e != nil; e = e.Next() {
 		e.Value.(IObject).Clean()
 	}
+	// 清理等待加入场景的子对象
+	for e := o.ChildrenToAdd.Front(); e != nil; e = e.Next() {
+		e.Value.(IObject).Clean()
+	}
 	// 清理自身
+	o.ChildrenToAdd.Init()
 	o.Children.Init()
 }
 
@@ -144,6 +161,11 @@ func (o *Object) GetNeedRemove() bool {
 // 设置是否需要移除
 func (o *Object) SetNeedRemove(needRemove bool) {
 	o.NeedRemove = needRemove
+}
+
+// 安全加入孩子
+func (o *Object) SafeAddChild(child IObject) {
+	o.ChildrenToAdd.PushBack(child)
 }
 
 // 非接口实现
