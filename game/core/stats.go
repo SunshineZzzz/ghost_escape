@@ -1,7 +1,5 @@
 package core
 
-import "fmt"
-
 // 基础状态组件
 type Stats struct {
 	// 继承基础对象
@@ -102,7 +100,7 @@ func (s *Stats) TakeDamage(damage float32) {
 		s.Health = 0.0
 		s.IsAlive = false
 	}
-	fmt.Printf("damage: %f, health: %f\n", damage, s.Health)
+	// fmt.Printf("damage: %f, health: %f\n", damage, s.Health)
 	s.IsInvincible = true
 	s.InvincibleTimer = 0.0
 }

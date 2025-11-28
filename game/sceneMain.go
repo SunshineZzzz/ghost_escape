@@ -3,6 +3,7 @@ package game
 import (
 	"ghost_escape/game/core"
 	"ghost_escape/game/screen"
+	"ghost_escape/game/world"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
 	"github.com/go-gl/mathgl/mgl32"
@@ -54,6 +55,12 @@ func (s *SceneMain) Init() {
 
 func (s *SceneMain) HandleEvent(event *sdl.Event) {
 	s.Scene.HandleEvent(event)
+	if event.Type() == sdl.EventMouseButtonDown {
+		if event.Button().Button == uint8(sdl.ButtonLeft) {
+			pos := core.GetInstance().GetMousePosition().Add(core.GetInstance().GetCurrentScene().GetCameraPosition())
+			world.AddSpellChild(s, "assets/effect/Thunderstrike w blur.png", pos, 60.0, 3.0, core.AnchorTypeCenter)
+		}
+	}
 }
 
 func (s *SceneMain) Update(dt float32) {

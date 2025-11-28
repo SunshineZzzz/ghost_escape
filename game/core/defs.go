@@ -10,6 +10,8 @@ const (
 	ObjectTypeScreen
 	// 世界对象
 	ObjectTypeWorld
+	// 敌人
+	ObjectTypeEnemy
 )
 
 // 锚点布局定义

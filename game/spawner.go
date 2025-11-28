@@ -1,8 +1,8 @@
 package game
 
 import (
-	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
+	"ghost_escape/game/world"
 )
 
 // 生成器
@@ -41,10 +41,8 @@ func (s *Spawner) Update(dt float32) {
 					Add(core.GetInstance().GetScreenSize()),
 			)
 			enemy := CreateEnemy(nil, pos, s.target)
-			// 敌人产生是从特效精灵动画结束后产生，所以这里生成特效精灵动画
-			SpriteAnim := affiliate.CteateSpriteAnimChild("assets/effect/184_3.png", 1.0, core.AnchorTypeCenter)
-			// 上面的特效加载到场景中
-			core.AddEffect(core.GetInstance().GetCurrentScene(), SpriteAnim, enemy.GetPosition(), enemy)
+			// 敌人产生是从特效精灵动画结束后产生，所以这里生成特效
+			world.AddEffect(core.GetInstance().GetCurrentScene(), "assets/effect/184_3.png", enemy.GetPosition(), 1.0, core.AnchorTypeCenter, enemy)
 		}
 	}
 }

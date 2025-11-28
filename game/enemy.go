@@ -66,14 +66,19 @@ func (e *Enemy) Init() {
 	e.currentSpriteAnim = e.spriteAnimNormal
 	e.Collider = affiliate.AddColliderChild(e, e.currentSpriteAnim.GetSize(), core.ColliderTypeCircle, core.AnchorTypeCenter)
 	e.Stats = core.AddStatusChild(&e.Actor, 100.0, 100.0, 40.0, 10.0)
+	e.SetType(core.ObjectTypeEnemy)
 }
 
 // 更新
 func (e *Enemy) Update(dt float32) {
 	e.Actor.Update(dt)
-	e.aimTarget(e.target)
-	e.Move(dt)
-	e.Attack()
+	if e.Stats.GetAlive() {
+		e.aimTarget(e.target)
+		e.Move(dt)
+		e.attack()
+	}
+	e.checkState()
+	e.remove()
 }
 
 // 非接口实现
@@ -95,13 +100,25 @@ func (e *Enemy) aimTarget(target *Player) {
 	e.SetVelocity(direction.Mul(e.GetMaxSpeed()))
 }
 
+// 检查状态
+func (e *Enemy) checkState() {
+	state := EnemyStateNormal
+	if e.Stats.GetHealth() < 0.1 {
+		state = EnemyStateDead
+	} else if e.Stats.GetInvincible() {
+		state = EnemyStateHurt
+	} else {
+		state = EnemyStateNormal
+	}
+
+	if e.currentState != state {
+		e.changeState(state)
+	}
+}
+
 // 改变状态
 func (e *Enemy) changeState(newState EnemyState) {
-	if e.currentState == newState {
-		return
-	}
 	e.currentSpriteAnim.SetActive(false)
-
 	switch newState {
 	case EnemyStateNormal:
 		e.currentSpriteAnim = e.spriteAnimNormal
@@ -118,14 +135,14 @@ func (e *Enemy) changeState(newState EnemyState) {
 }
 
 // 移除
-func (e *Enemy) Remove() {
+func (e *Enemy) remove() {
 	if e.currentSpriteAnim.GetFinish() {
 		e.SetNeedRemove(true)
 	}
 }
 
 // 攻击
-func (e *Enemy) Attack() {
+func (e *Enemy) attack() {
 	if e.target == nil {
 		return
 	}

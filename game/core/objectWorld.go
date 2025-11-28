@@ -9,6 +9,10 @@ type IObjectWorld interface {
 	IObjectScreen
 	// 获取世界位置
 	GetPosition() mgl32.Vec2
+	// 获取碰撞体组件
+	GetCollider() IObjectCollider
+	// 受到伤害
+	TakeDamage(float32)
 }
 
 // 基础世界对象
@@ -64,4 +68,8 @@ func (o *ObjectWorld) SetCollider(collider IObjectCollider) {
 // 获取碰撞体组件
 func (o *ObjectWorld) GetCollider() IObjectCollider {
 	return o.Collider
+}
+
+func (o *ObjectWorld) TakeDamage(damage float32) {
+	panic("not implemented")
 }

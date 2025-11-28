@@ -40,6 +40,8 @@ type IObject interface {
 
 // 基础对象
 type Object struct {
+	// 自身引用，实现多态，要不然始终调用Object的方法
+	Self IObject
 	// 对象类型
 	ObjectType ObjectType
 	// 子对象列表
@@ -76,7 +78,11 @@ func (o *Object) HandleEvent(event *sdl.Event) {
 func (o *Object) Update(dt float32) {
 	for e := o.ChildrenToAdd.Front(); e != nil; {
 		next := e.Next()
-		o.Children.PushBack(e.Value)
+		if o.Self != nil {
+			o.Self.AddChild(e.Value.(IObject))
+		} else {
+			o.AddChild(e.Value.(IObject))
+		}
 		o.ChildrenToAdd.Remove(e)
 		e = next
 	}

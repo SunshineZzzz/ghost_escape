@@ -20,6 +20,10 @@ type IScene interface {
 	SetCameraPosition(mgl32.Vec2)
 	// 获取世界大小
 	GetWorldSize() mgl32.Vec2
+	// 获取世界对象孩子
+	GetChildWorld() *list.List
+	// 获取屏幕对象孩子
+	GetChildScreen() *list.List
 }
 
 // 基础场景
@@ -72,6 +76,8 @@ func (s *Scene) Init() {
 	s.Object.Init()
 	s.ChildrenWorld.Init()
 	s.ChildrenScreen.Init()
+	// 我这里重写了AddChild所以需要设置Self
+	s.Object.Self = s
 }
 
 // 处理事件
@@ -147,7 +153,7 @@ func (s *Scene) Clean() {
 // 增加孩子
 func (s *Scene) AddChild(child IObject) {
 	switch child.GetType() {
-	case ObjectTypeWorld:
+	case ObjectTypeWorld, ObjectTypeEnemy:
 		s.ChildrenWorld.PushBack(child)
 	case ObjectTypeScreen:
 		s.ChildrenScreen.PushBack(child)
@@ -174,4 +180,14 @@ func (s *Scene) RemoveChild(child IObject) {
 	default:
 		s.Object.RemoveChild(child)
 	}
+}
+
+// 获取世界对象孩子
+func (s *Scene) GetChildWorld() *list.List {
+	return &s.ChildrenWorld
+}
+
+// 获取屏幕对象孩子
+func (s *Scene) GetChildScreen() *list.List {
+	return &s.ChildrenScreen
 }
