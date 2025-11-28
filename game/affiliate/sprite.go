@@ -33,7 +33,7 @@ var _ ISprite = (*Sprite)(nil)
 var _ core.IObjectAffiliate = (*Sprite)(nil)
 
 // 添加精灵图子对象
-func AddSpriteChild(parent core.IObjectWorld, filePath string, scale float32, anchorType core.AnchorType) *Sprite {
+func AddSpriteChild(parent core.IObjectScreen, filePath string, scale float32, anchorType core.AnchorType) *Sprite {
 	child := &Sprite{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))

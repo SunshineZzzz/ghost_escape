@@ -12,6 +12,8 @@ type IObjectScreen interface {
 	SetRenderPosition(mgl32.Vec2)
 	// 获取渲染(屏幕)位置
 	GetRenderPosition() mgl32.Vec2
+	// 获取世界位置
+	GetPosition() mgl32.Vec2
 }
 
 // 基础屏幕对象
@@ -39,6 +41,11 @@ func (o *ObjectScreen) Init() {
 // 获取渲染(屏幕)位置
 func (o *ObjectScreen) GetRenderPosition() mgl32.Vec2 {
 	return o.RenderPosition
+}
+
+// 获取世界位置
+func (o *ObjectScreen) GetPosition() mgl32.Vec2 {
+	panic("GetPosition not implemented")
 }
 
 // 非接口实现

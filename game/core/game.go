@@ -56,6 +56,10 @@ type Game struct {
 	sdlRenderer *sdl.Renderer
 	// 当前场景
 	currentScene IScene
+	// 鼠标位置
+	mousePosition mgl32.Vec2
+	// 鼠标按钮状态
+	mouseButtons sdl.MouseButtonFlags
 }
 
 func (g *Game) Init(title string, width, height int32, scene IScene) error {
@@ -125,6 +129,8 @@ func (g *Game) handleEvent() {
 
 // 更新状态
 func (g *Game) update(dt float32) {
+	// 更新鼠标位置和按钮状态
+	g.mouseButtons = sdl.GetMouseState(&g.mousePosition[0], &g.mousePosition[1])
 	g.currentScene.Update(dt)
 }
 
@@ -295,4 +301,14 @@ func (g *Game) RandVec2(min, max mgl32.Vec2) mgl32.Vec2 {
 		g.RandFloat32(min.X(), max.X()),
 		g.RandFloat32(min.Y(), max.Y()),
 	}
+}
+
+// 获取鼠标位置
+func (g *Game) GetMousePosition() mgl32.Vec2 {
+	return g.mousePosition
+}
+
+// 获取鼠标按钮状态
+func (g *Game) GetMouseButtons() sdl.MouseButtonFlags {
+	return g.mouseButtons
 }

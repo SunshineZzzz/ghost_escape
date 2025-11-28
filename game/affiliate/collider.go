@@ -17,7 +17,7 @@ var _ core.IObjectCollider = (*Collider)(nil)
 var _ core.IObjectAffiliate = (*Collider)(nil)
 
 // 添加碰撞器子对象
-func AddColliderChild(parent core.IObjectWorld, size mgl32.Vec2, colliderType core.ColliderType, anchorType core.AnchorType) *Collider {
+func AddColliderChild(parent core.IObjectScreen, size mgl32.Vec2, colliderType core.ColliderType, anchorType core.AnchorType) *Collider {
 	if colliderType != core.ColliderTypeCircle {
 		return nil
 	}

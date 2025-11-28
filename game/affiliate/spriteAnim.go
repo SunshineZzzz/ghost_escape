@@ -30,7 +30,7 @@ var _ core.IObjectAnima = (*SpriteAnim)(nil)
 var _ core.IObjectAffiliate = (*SpriteAnim)(nil)
 
 // 添加精灵图动画组件到父对象中
-func AddSpriteAnimChild(parent core.IObjectWorld, filePath string, scale float32, anchorType core.AnchorType) *SpriteAnim {
+func AddSpriteAnimChild(parent core.IObjectScreen, filePath string, scale float32, anchorType core.AnchorType) *SpriteAnim {
 	child := &SpriteAnim{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))

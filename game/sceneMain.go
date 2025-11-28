@@ -2,6 +2,7 @@ package game
 
 import (
 	"ghost_escape/game/core"
+	"ghost_escape/game/screen"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
 	"github.com/go-gl/mathgl/mgl32"
@@ -12,6 +13,8 @@ type SceneMain struct {
 	core.Scene
 	// 生成器
 	spawner *Spawner
+	// UI鼠标
+	uimouse *screen.UIMouse
 }
 
 var _ core.IObject = (*SceneMain)(nil)
@@ -34,6 +37,9 @@ func (s *SceneMain) Init() {
 	spawner.SetTarget(player)
 	s.spawner = spawner
 	s.AddChild(spawner)
+
+	// UI鼠标
+	s.uimouse = screen.AddUIMouse(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
 
 	// // 敌人
 	// enemy := &Enemy{}

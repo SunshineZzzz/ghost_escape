@@ -23,9 +23,9 @@ type IObjectCollider interface {
 	// 是否发生碰撞
 	IsColliding(IObjectCollider) bool
 	// 获取父节点
-	GetParent() IObjectWorld
+	GetParent() IObjectScreen
 	// 设置父亲节点
-	SetParent(IObjectWorld)
+	SetParent(IObjectScreen)
 	// 获取相对父节点偏移
 	GetOffset() mgl32.Vec2
 	// 设置相对父节点偏移
