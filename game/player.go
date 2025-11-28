@@ -26,12 +26,12 @@ var _ core.IObjectScreen = (*Player)(nil)
 func (p *Player) Init() {
 	p.Actor.Init()
 	p.MaxSpeed = 500.0
-	p.spriteIdleAnim = affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-idle.png", 2.0)
-	p.spriteMoveAnim = affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-move.png", 2.0)
+	p.spriteIdleAnim = affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-idle.png", 2.0, core.AnchorTypeCenter)
+	p.spriteMoveAnim = affiliate.AddSpriteAnimChild(p, "assets/sprite/ghost-move.png", 2.0, core.AnchorTypeCenter)
 	p.spriteIdleAnim.SetActive(true)
 	p.spriteMoveAnim.SetActive(false)
 	p.isMoving = false
-	p.Collider = affiliate.AddColliderChild(p, p.spriteIdleAnim.GetSize(), core.ColliderTypeCircle)
+	p.Collider = affiliate.AddColliderChild(p, p.spriteIdleAnim.GetSize().Mul(0.5), core.ColliderTypeCircle, core.AnchorTypeCenter)
 }
 
 // 处理事件

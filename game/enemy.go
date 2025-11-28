@@ -43,15 +43,15 @@ var _ core.IObjectScreen = (*Enemy)(nil)
 func (e *Enemy) Init() {
 	e.Actor.Init()
 	e.currentState = EnemyStateNormal
-	e.spriteAnimNormal = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghost-Sheet.png", 2.0)
-	e.spriteAnimHurt = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghostHurt-Sheet.png", 2.0)
-	e.spriteAnimDead = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghostDead-Sheet.png", 2.0)
+	e.spriteAnimNormal = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghost-Sheet.png", 2.0, core.AnchorTypeCenter)
+	e.spriteAnimHurt = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghostHurt-Sheet.png", 2.0, core.AnchorTypeCenter)
+	e.spriteAnimDead = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghostDead-Sheet.png", 2.0, core.AnchorTypeCenter)
 	e.spriteAnimNormal.SetActive(true)
 	e.spriteAnimHurt.SetActive(false)
 	e.spriteAnimDead.SetActive(false)
 	e.spriteAnimDead.SetLoop(false)
 	e.currentSpriteAnim = e.spriteAnimNormal
-	e.Collider = affiliate.AddColliderChild(e, e.currentSpriteAnim.GetSize(), core.ColliderTypeCircle)
+	e.Collider = affiliate.AddColliderChild(e, e.currentSpriteAnim.GetSize(), core.ColliderTypeCircle, core.AnchorTypeCenter)
 }
 
 // 更新

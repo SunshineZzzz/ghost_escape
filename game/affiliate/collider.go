@@ -16,7 +16,7 @@ var _ core.IObject = (*Collider)(nil)
 var _ core.IObjectCollider = (*Collider)(nil)
 
 // 添加碰撞器子对象
-func AddColliderChild(parent core.IObjectWorld, size mgl32.Vec2, colliderType core.ColliderType) *Collider {
+func AddColliderChild(parent core.IObjectWorld, size mgl32.Vec2, colliderType core.ColliderType, anchorType core.AnchorType) *Collider {
 	if colliderType != core.ColliderTypeCircle {
 		return nil
 	}
@@ -26,6 +26,7 @@ func AddColliderChild(parent core.IObjectWorld, size mgl32.Vec2, colliderType co
 	child.SetSize(size)
 	child.SetParent(parent)
 	child.SetColliderType(colliderType)
+	child.SetAnchorType(anchorType)
 	parent.AddChild(child)
 	return child
 }

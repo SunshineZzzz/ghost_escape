@@ -32,11 +32,12 @@ var _ core.IObject = (*Sprite)(nil)
 var _ ISprite = (*Sprite)(nil)
 
 // 添加精灵图子对象
-func AddSpriteChild(parent core.IObjectWorld, filePath string, scale float32) *Sprite {
+func AddSpriteChild(parent core.IObjectWorld, filePath string, scale float32, anchorType core.AnchorType) *Sprite {
 	child := &Sprite{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))
 	child.SetScale(scale)
+	child.SetAnchorType(anchorType)
 	child.SetParent(parent)
 	parent.AddChild(child)
 	return child

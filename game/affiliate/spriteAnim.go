@@ -27,12 +27,13 @@ type SpriteAnim struct {
 var _ core.IObject = (*Sprite)(nil)
 var _ ISprite = (*Sprite)(nil)
 
-func AddSpriteAnimChild(parent core.IObjectWorld, filePath string, scale float32) *SpriteAnim {
+func AddSpriteAnimChild(parent core.IObjectWorld, filePath string, scale float32, anchorType core.AnchorType) *SpriteAnim {
 	child := &SpriteAnim{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))
 	child.SetScale(scale)
 	child.SetParent(parent)
+	child.SetAnchorType(anchorType)
 	parent.AddChild(child)
 	return child
 }
