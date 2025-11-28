@@ -32,6 +32,7 @@ func (p *Player) Init() {
 	p.spriteMoveAnim.SetActive(false)
 	p.isMoving = false
 	p.Collider = affiliate.AddColliderChild(p, p.spriteIdleAnim.GetSize().Mul(0.5), core.ColliderTypeCircle, core.AnchorTypeCenter)
+	p.Stats = core.AddStatusChild(&p.Actor, 100.0, 100.0, 40.0, 10.0)
 }
 
 // 处理事件
@@ -48,6 +49,8 @@ func (p *Player) Update(dt float32) {
 	p.Move(dt)
 	p.checkState()
 	p.syncCamera()
+	// TODO
+	// p.GetAlive()
 }
 
 // 渲染

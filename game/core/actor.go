@@ -12,6 +12,8 @@ type Actor struct {
 	Velocity mgl32.Vec2
 	// 最大速度大小
 	MaxSpeed float32
+	// 角色属性组件
+	Stats *Stats
 }
 
 var _ IObject = (*Actor)(nil)
@@ -51,5 +53,30 @@ func (a *Actor) Move(dt float32) {
 	a.Position[0] = mgl32.Clamp(newPos.X(), 0.0, a.Game().GetWorldSize().X())
 	a.Position[1] = mgl32.Clamp(newPos.Y(), 0.0, a.Game().GetWorldSize().Y())
 	a.SetPosition(a.Position)
-	// fmt.Printf("dt: %f, pos: %v, vel: %v\n", dt, a.Position, a.Velocity)
+}
+
+// 获取角色属性
+func (a *Actor) GetStats() *Stats {
+	return a.Stats
+}
+
+// 设置角色属性
+func (a *Actor) SetStats(stats *Stats) {
+	a.Stats = stats
+}
+
+// 被伤害
+func (a *Actor) TakeDamage(damage float32) {
+	if a.Stats == nil {
+		return
+	}
+	a.Stats.TakeDamage(damage)
+}
+
+// 获取是否活着
+func (a *Actor) GetAlive() bool {
+	if a.Stats == nil {
+		return false
+	}
+	return a.Stats.GetAlive()
 }

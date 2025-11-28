@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
 )
@@ -52,6 +51,7 @@ func (e *Enemy) Init() {
 	e.spriteAnimDead.SetLoop(false)
 	e.currentSpriteAnim = e.spriteAnimNormal
 	e.Collider = affiliate.AddColliderChild(e, e.currentSpriteAnim.GetSize(), core.ColliderTypeCircle, core.AnchorTypeCenter)
+	e.Stats = core.AddStatusChild(&e.Actor, 100.0, 100.0, 40.0, 10.0)
 }
 
 // 更新
@@ -76,6 +76,7 @@ func (e *Enemy) aimTarget(target *Player) {
 	}
 	// 计算目标方向，并且归一化
 	direction := target.GetPosition().Sub(e.GetPosition()).Normalize()
+	// fmt.Printf("pos: %v, targetPos: %v, direction: %v\n", e.GetPosition(), target.GetPosition(), direction)
 	// 设置速度
 	e.SetVelocity(direction.Mul(e.GetMaxSpeed()))
 }
@@ -115,6 +116,8 @@ func (e *Enemy) Attack() {
 		return
 	}
 	if e.Collider.IsColliding(e.target.GetCollider()) {
-		fmt.Println("敌人攻击玩家")
+		if e.Stats.GetAlive() && e.target.Stats.GetAlive() {
+			e.target.TakeDamage(e.Stats.GetDamage())
+		}
 	}
 }
