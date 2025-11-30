@@ -8,6 +8,8 @@ import (
 
 // 精灵图抽象
 type ISprite interface {
+	// 继承基础依附对象
+	core.IObjectAffiliate
 	// 设置纹理
 	SetTexture(*core.Texture)
 	// 设置反转
@@ -26,6 +28,8 @@ type Sprite struct {
 	core.ObjectAffiliate
 	// 纹理
 	Texture *core.Texture
+	// 百分比
+	Percent mgl32.Vec2
 }
 
 var _ core.IObject = (*Sprite)(nil)
@@ -37,8 +41,8 @@ func AddSpriteChild(parent core.IObjectScreen, filePath string, scale float32, a
 	child := &Sprite{}
 	child.Init()
 	child.SetTexture(core.CreateTexture(filePath))
-	child.SetScale(scale)
 	child.SetAnchorType(anchorType)
+	child.SetScale(scale)
 	child.SetParent(parent)
 	parent.AddChild(child)
 	return child
@@ -47,6 +51,8 @@ func AddSpriteChild(parent core.IObjectScreen, filePath string, scale float32, a
 // 初始化
 func (s *Sprite) Init() {
 	s.ObjectAffiliate.Init()
+	// 初始化百分比为1.0
+	s.Percent = mgl32.Vec2{1.0, 1.0}
 }
 
 // 渲染
@@ -58,7 +64,8 @@ func (s *Sprite) Render() {
 		return
 	}
 	pos := s.Parent.GetRenderPosition().Add(s.Offset)
-	core.GetInstance().RenderTexture(s.Texture, pos, s.Size)
+	// fmt.Printf("percent: %v\n", s.GetPercent())
+	core.GetInstance().RenderTexture(s.Texture, pos, s.Size, s.GetPercent())
 }
 
 // 设置纹理
@@ -85,6 +92,16 @@ func (s *Sprite) SetAngle(angle float64) {
 // 获取角度
 func (s *Sprite) GetAngle() float64 {
 	return s.Texture.Angle
+}
+
+// 获取百分比
+func (s *Sprite) GetPercent() mgl32.Vec2 {
+	return s.Percent
+}
+
+// 设置百分比
+func (s *Sprite) SetPercent(percent mgl32.Vec2) {
+	s.Percent = percent
 }
 
 // 非接口实现

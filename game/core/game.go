@@ -235,12 +235,18 @@ func (g *Game) GetAssetStore() *AssetStore {
 }
 
 // 渲染纹理
-func (g *Game) RenderTexture(texture *Texture, pos mgl32.Vec2, size mgl32.Vec2) {
+func (g *Game) RenderTexture(texture *Texture, pos mgl32.Vec2, size mgl32.Vec2, percent mgl32.Vec2) {
+	srcRect := sdl.FRect{
+		X: texture.SrcRect.X,
+		Y: texture.SrcRect.Y,
+		W: texture.SrcRect.W * percent.X(),
+		H: texture.SrcRect.H * percent.Y(),
+	}
 	dstRect := sdl.FRect{
 		X: pos.X(),
 		Y: pos.Y(),
-		W: size.X(),
-		H: size.Y(),
+		W: size.X() * percent.X(),
+		H: size.Y() * percent.Y(),
 	}
 	screenRect := sdl.FRect{
 		X: 0.0,
@@ -256,7 +262,7 @@ func (g *Game) RenderTexture(texture *Texture, pos mgl32.Vec2, size mgl32.Vec2) 
 	if texture.IsFlip {
 		flipMode = sdl.FlipHorizontal
 	}
-	sdl.RenderTextureRotated(g.sdlRenderer, texture.Texture, &texture.SrcRect, &intersectionRect, texture.Angle, nil, flipMode)
+	sdl.RenderTextureRotated(g.sdlRenderer, texture.Texture, &srcRect, &intersectionRect, texture.Angle, nil, flipMode)
 }
 
 // 绘制填充圆，并不是画圆，而是用绘制圆形纹理，目的是可视化碰撞器
@@ -314,7 +320,7 @@ func (g *Game) GetMouseButtons() sdl.MouseButtonFlags {
 }
 
 // 绘制水平进度条
-func (g *Game) RenderHBar(pos mgl32.Vec2, size mgl32.Vec2, percent float32, color sdl.FColor) {
+func (g *Game) RenderHBar(pos mgl32.Vec2, size mgl32.Vec2, percent mgl32.Vec2, color sdl.FColor) {
 	boundaryRect := sdl.FRect{
 		X: pos.X(),
 		Y: pos.Y(),
@@ -324,8 +330,8 @@ func (g *Game) RenderHBar(pos mgl32.Vec2, size mgl32.Vec2, percent float32, colo
 	fillRect := sdl.FRect{
 		X: pos.X(),
 		Y: pos.Y(),
-		W: size.X() * percent,
-		H: size.Y(),
+		W: size.X() * percent.X(),
+		H: size.Y() * percent.Y(),
 	}
 	screenRect := sdl.FRect{
 		X: 0.0,

@@ -34,9 +34,9 @@ func (p *Player) Init() {
 	p.spriteMoveAnim.SetActive(false)
 	p.isMoving = false
 	p.Collider = affiliate.AddColliderChild(p, p.spriteIdleAnim.GetSize().Mul(0.5), core.ColliderTypeCircle, core.AnchorTypeCenter)
-	p.Stats = core.AddStatusChild(&p.Actor, 100.0, 100.0, 40.0, 100.0)
+	p.Stats = core.AddStatusChild(&p.Actor, 100.0, 100.0, 40.0, 10.0)
 	// 雷武器组件
-	p.Weapon = AddWeaponThunderChild(&p.Actor, 0.1, 40.0)
+	p.Weapon = AddWeaponThunderChild(&p.Actor, 2.0, 40.0)
 }
 
 // 处理事件

@@ -27,7 +27,9 @@ type IObjectAffiliate interface {
 	// 设置锚点布局类型
 	SetAnchorType(AnchorType)
 	// 设置百分比
-	SetPercent(float32)
+	SetPercent(mgl32.Vec2)
+	// 获取百分比
+	GetPercent() mgl32.Vec2
 }
 
 // 基础依附对象
@@ -127,8 +129,13 @@ func (o *ObjectAffiliate) SetOffsetByAnchorType(anchor AnchorType) {
 }
 
 // 设置百分比
-func (o *ObjectAffiliate) SetPercent(percent float32) {
+func (o *ObjectAffiliate) SetPercent(percent mgl32.Vec2) {
 	panic("SetPercent not implemented")
+}
+
+// 获取百分比
+func (o *ObjectAffiliate) GetPercent() mgl32.Vec2 {
+	panic("GetPercent not implemented")
 }
 
 // 非接口实现

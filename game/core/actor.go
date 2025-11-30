@@ -95,5 +95,5 @@ func (a *Actor) updateHealthBar() {
 		return
 	}
 	// 更新血条
-	a.HealthBar.SetPercent(a.Stats.GetHealth() / a.Stats.GetMaxHealth())
+	a.HealthBar.SetPercent(mgl32.Vec2{a.Stats.GetHealth() / a.Stats.GetMaxHealth(), 1.0})
 }

@@ -12,7 +12,7 @@ type AffiliateBar struct {
 	// 继承基础依附对象
 	core.ObjectAffiliate
 	// 百分比
-	Percent float32
+	Percent mgl32.Vec2
 	// 高进度条颜色
 	ColorHigh sdl.FColor
 	// 中等进度条颜色
@@ -40,7 +40,7 @@ func AddAffiliateBarChild(parent core.IObjectScreen, size mgl32.Vec2, anchor cor
 // 初始化进度条
 func (b *AffiliateBar) Init() {
 	b.ObjectAffiliate.Init()
-	b.Percent = 0.0
+	b.Percent = mgl32.Vec2{0.0, 1.0}
 	// 绿色
 	b.ColorHigh = sdl.FColor{R: 0.0, G: 1.0, B: 0.0, A: 1.0}
 	// 橙色
@@ -53,9 +53,9 @@ func (b *AffiliateBar) Init() {
 func (b *AffiliateBar) Render() {
 	b.ObjectAffiliate.Render()
 	pos := b.Parent.GetRenderPosition().Add(b.Offset)
-	if b.Percent > 0.75 {
+	if b.Percent.X() > 0.75 {
 		core.GetInstance().RenderHBar(pos, b.Size, b.Percent, b.ColorHigh)
-	} else if b.Percent > 0.3 {
+	} else if b.Percent.X() > 0.3 {
 		core.GetInstance().RenderHBar(pos, b.Size, b.Percent, b.ColorMid)
 	} else {
 		core.GetInstance().RenderHBar(pos, b.Size, b.Percent, b.ColorLow)
@@ -65,12 +65,12 @@ func (b *AffiliateBar) Render() {
 // 非接口实现
 
 // 获取进度条百分比
-func (b *AffiliateBar) GetPercent() float32 {
+func (b *AffiliateBar) GetPercent() mgl32.Vec2 {
 	return b.Percent
 }
 
 // 设置进度条百分比
-func (b *AffiliateBar) SetPercent(percent float32) {
+func (b *AffiliateBar) SetPercent(percent mgl32.Vec2) {
 	b.Percent = percent
 }
 
