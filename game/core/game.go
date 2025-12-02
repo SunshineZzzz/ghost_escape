@@ -54,6 +54,8 @@ type Game struct {
 	sdlWindow *sdl.Window
 	// SDL渲染器
 	sdlRenderer *sdl.Renderer
+	// 字体引擎
+	ttfEngine *ttf.TextEngine
 	// 当前场景
 	currentScene IScene
 	// 鼠标位置
@@ -85,6 +87,8 @@ func (g *Game) Init(title string, width, height int32, scene IScene) error {
 	if !ttf.Init() {
 		return fmt.Errorf("ttf init error,%s", sdl.GetError())
 	}
+	// 创建字体引擎
+	g.ttfEngine = ttf.CreateRendererTextEngine(g.sdlRenderer)
 
 	// 创建资源管理器
 	g.assetStore = CreateAssetStore(g.sdlRenderer)
@@ -161,6 +165,10 @@ func (g *Game) Clean() {
 	if g.sdlWindow != nil {
 		sdl.DestroyWindow(g.sdlWindow)
 		g.sdlWindow = nil
+	}
+	if g.ttfEngine != nil {
+		ttf.DestroyRendererTextEngine(g.ttfEngine)
+		g.ttfEngine = nil
 	}
 	sdl.Quit()
 }
@@ -352,4 +360,13 @@ func (g *Game) RenderHBar(pos mgl32.Vec2, size mgl32.Vec2, percent mgl32.Vec2, c
 		sdl.RenderFillRect(g.sdlRenderer, &intersectionRect2)
 	}
 	sdl.SetRenderDrawColorFloat(g.sdlRenderer, 0.0, 0.0, 0.0, 1.0)
+}
+
+// 创建TTF文本
+func (g *Game) CreateTTFText(text string, fontPath string, fontSize float32) *ttf.Text {
+	font, err := g.assetStore.GetFont(fontPath, fontSize)
+	if err != nil {
+		return nil
+	}
+	return ttf.CreateText(g.ttfEngine, font, text, 0)
 }
