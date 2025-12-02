@@ -34,7 +34,7 @@ type HudStats struct {
 }
 
 // 创建状态HUD
-func AddHudStats(parent core.IObject, target *core.Actor, renderPosition mgl32.Vec2) *HudStats {
+func AddHudStatsChild(parent core.IObject, target *core.Actor, renderPosition mgl32.Vec2) *HudStats {
 	// 创建状态HUD对象
 	hudStats := &HudStats{}
 	hudStats.Init()

@@ -23,6 +23,7 @@ type Player struct {
 
 var _ core.IObject = (*Player)(nil)
 var _ core.IObjectScreen = (*Player)(nil)
+var _ core.IActor = (*Player)(nil)
 
 // 初始化
 func (p *Player) Init() {
@@ -121,4 +122,12 @@ func (p *Player) changeState() {
 		p.spriteIdleAnim.SetFrameTimer(p.spriteMoveAnim.GetCurrentFrame())
 		p.spriteIdleAnim.SetCurrentFrame(p.spriteMoveAnim.GetCurrentFrame())
 	}
+}
+
+// 获取技能使用恢复百分比
+func (p *Player) GetSkillPercent() float32 {
+	if p.Weapon != nil {
+		return p.Weapon.GetSkillPercent()
+	}
+	return 1.0
 }

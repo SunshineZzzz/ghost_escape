@@ -4,6 +4,12 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+// 基础角色抽象
+type IActor interface {
+	// 获取技能使用恢复百分比
+	GetSkillPercent() float32
+}
+
 // 基础角色
 type Actor struct {
 	// 继承基础世界对象
@@ -20,6 +26,7 @@ type Actor struct {
 
 var _ IObject = (*Actor)(nil)
 var _ IObjectScreen = (*Actor)(nil)
+var _ IActor = (*Actor)(nil)
 
 // 初始化
 func (a *Actor) Init() {
@@ -96,4 +103,9 @@ func (a *Actor) updateHealthBar() {
 	}
 	// 更新血条
 	a.HealthBar.SetPercent(mgl32.Vec2{a.Stats.GetHealth() / a.Stats.GetMaxHealth(), 1.0})
+}
+
+// 获取技能使用恢复百分比
+func (a *Actor) GetSkillPercent() float32 {
+	panic("GetSkillPercent not implemented")
 }

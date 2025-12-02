@@ -44,3 +44,8 @@ func (w *WeaponThunder) HandleEvent(event *sdl.Event) {
 		}
 	}
 }
+
+// 获取技能使用恢复百分比
+func (w *WeaponThunder) GetSkillPercent() float32 {
+	return w.CooldownTimer / w.Cooldown
+}

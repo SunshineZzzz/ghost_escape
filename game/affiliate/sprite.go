@@ -10,6 +10,8 @@ import (
 type ISprite interface {
 	// 继承基础依附对象
 	core.IObjectAffiliate
+	// 获取纹理
+	GetTexture() *core.Texture
 	// 设置纹理
 	SetTexture(*core.Texture)
 	// 设置反转
@@ -66,6 +68,11 @@ func (s *Sprite) Render() {
 	pos := s.Parent.GetRenderPosition().Add(s.Offset)
 	// fmt.Printf("percent: %v\n", s.GetPercent())
 	core.GetInstance().RenderTexture(s.Texture, pos, s.Size, s.GetPercent())
+}
+
+// 获取纹理
+func (s *Sprite) GetTexture() *core.Texture {
+	return s.Texture
 }
 
 // 设置纹理

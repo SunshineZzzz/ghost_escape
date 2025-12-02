@@ -34,6 +34,7 @@ func (w *Weapon) Init() {
 // 更新
 func (w *Weapon) Update(dt float32) {
 	w.Object.Update(dt)
+	// 很可能大于1
 	w.CooldownTimer += dt
 }
 

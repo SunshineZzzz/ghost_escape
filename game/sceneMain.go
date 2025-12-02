@@ -17,6 +17,8 @@ type SceneMain struct {
 	uimouse *screen.UIMouse
 	// HUD状态
 	hudStats *screen.HudStats
+	// HUD技能
+	hudSkills *screen.HudSkill
 }
 
 var _ core.IObject = (*SceneMain)(nil)
@@ -41,9 +43,11 @@ func (s *SceneMain) Init() {
 	s.AddChild(spawner)
 
 	// UI鼠标
-	s.uimouse = screen.AddUIMouse(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
+	s.uimouse = screen.AddUIMouseChild(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
 	// HUD状态
-	s.hudStats = screen.AddHudStats(s, &player.Actor, mgl32.Vec2{30.0, 30.0})
+	s.hudStats = screen.AddHudStatsChild(s, &player.Actor, mgl32.Vec2{30.0, 30.0})
+	// HUD技能
+	s.hudSkills = screen.AddHudSkillChild(s, player, "assets/UI/Electric-Icon.png", mgl32.Vec2{player.Game().GetScreenSize().X() - 300.0, 30.0}, 0.14, core.AnchorTypeCenter)
 
 	// // 敌人
 	// enemy := &Enemy{}

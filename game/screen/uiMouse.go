@@ -20,7 +20,7 @@ type UIMouse struct {
 var _ core.IObject = (*UIMouse)(nil)
 var _ core.IObjectScreen = (*UIMouse)(nil)
 
-func AddUIMouse(parent core.IObject, spritePath1, spritePath2 string, scale float32, anchor core.AnchorType) *UIMouse {
+func AddUIMouseChild(parent core.IObject, spritePath1, spritePath2 string, scale float32, anchor core.AnchorType) *UIMouse {
 	uiMouse := &UIMouse{}
 	uiMouse.Init()
 	uiMouse.sprite1 = affiliate.AddSpriteChild(uiMouse, spritePath1, scale, anchor)
