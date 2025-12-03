@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	sceneMain := &game.SceneMain{}
+	sceneTitle := &game.SceneTitle{}
 	game := core.GetInstance()
-	if err := game.Init("GhostEscape", 1280, 720, sceneMain); err != nil {
+	if err := game.Init("GhostEscape", 1280, 720, sceneTitle); err != nil {
 		fmt.Println(err)
 		return
 	}
