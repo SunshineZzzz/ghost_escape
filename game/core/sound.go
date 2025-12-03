@@ -221,7 +221,7 @@ func oggAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 			remaining = len(ogg.audioData)
 		} else {
 			ogg.isPlaying = false
-			sdl.AudioStreamDevicePaused(stream)
+			sdl.PauseAudioStreamDevice(stream)
 			sdl.ClearAudioStream(stream)
 			return
 		}
@@ -250,6 +250,12 @@ func (o *oggSound) Play() {
 	if o.stream == nil || o.id == 0 {
 		return
 	}
+
+	if o.isPlaying {
+		// 这里肯定会进来，但是断不到点
+		return
+	}
+
 	o.isPlaying = true
 	o.dataPos = 0
 	sdl.ClearAudioStream(o.stream)
@@ -265,7 +271,7 @@ func (o *oggSound) Pause() {
 		return
 	}
 	o.isPlaying = false
-	sdl.AudioStreamDevicePaused(o.stream)
+	sdl.PauseAudioStreamDevice(o.stream)
 }
 
 // 恢复
@@ -290,7 +296,7 @@ func (o *oggSound) Stop() {
 	}
 	o.isPlaying = false
 	o.dataPos = 0
-	sdl.AudioStreamDevicePaused(o.stream)
+	sdl.PauseAudioStreamDevice(o.stream)
 	sdl.ClearAudioStream(o.stream)
 }
 
@@ -409,6 +415,8 @@ func wavAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 	wav.Lock()
 	defer wav.Unlock()
 
+	// fmt.Printf("wavAudioCallback id:%d, additionalAmount:%d, totalAmount:%d\n", id, additionalAmount, totalAmount)
+
 	if wav.id != id || !wav.isPlaying || wav.audioLen == 0 {
 		return
 	}
@@ -421,7 +429,7 @@ func wavAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 			remaining = wav.audioLen
 		} else {
 			wav.isPlaying = false
-			sdl.AudioStreamDevicePaused(stream)
+			sdl.PauseAudioStreamDevice(stream)
 			sdl.ClearAudioStream(stream)
 			return
 		}
@@ -451,6 +459,12 @@ func (w *wavSound) Play() {
 	if w.stream == nil || w.id == 0 {
 		return
 	}
+
+	if w.isPlaying {
+		// 这里肯定会进来，但是断不到点
+		return
+	}
+
 	w.isPlaying = true
 	w.dataPos = 0
 	sdl.ClearAudioStream(w.stream)
@@ -466,7 +480,7 @@ func (w *wavSound) Pause() {
 		return
 	}
 	w.isPlaying = false
-	sdl.AudioStreamDevicePaused(w.stream)
+	sdl.PauseAudioStreamDevice(w.stream)
 }
 
 // 恢复
@@ -491,7 +505,7 @@ func (w *wavSound) Stop() {
 	}
 	w.isPlaying = false
 	w.dataPos = 0
-	sdl.AudioStreamDevicePaused(w.stream)
+	sdl.PauseAudioStreamDevice(w.stream)
 	sdl.ClearAudioStream(w.stream)
 }
 
@@ -637,7 +651,7 @@ func mp3AudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 			remaining = len(mp3.audioData)
 		} else {
 			mp3.isPlaying = false
-			sdl.AudioStreamDevicePaused(stream)
+			sdl.PauseAudioStreamDevice(stream)
 			sdl.ClearAudioStream(stream)
 			return
 		}
@@ -666,6 +680,12 @@ func (o *mp3Sound) Play() {
 	if o.stream == nil || o.id == 0 {
 		return
 	}
+
+	if o.isPlaying {
+		// 这里肯定会进来，但是断不到点
+		return
+	}
+
 	o.isPlaying = true
 	o.dataPos = 0
 	sdl.ClearAudioStream(o.stream)
@@ -681,7 +701,7 @@ func (o *mp3Sound) Pause() {
 		return
 	}
 	o.isPlaying = false
-	sdl.AudioStreamDevicePaused(o.stream)
+	sdl.PauseAudioStreamDevice(o.stream)
 }
 
 // 恢复
@@ -706,7 +726,7 @@ func (o *mp3Sound) Stop() {
 	}
 	o.isPlaying = false
 	o.dataPos = 0
-	sdl.AudioStreamDevicePaused(o.stream)
+	sdl.PauseAudioStreamDevice(o.stream)
 	sdl.ClearAudioStream(o.stream)
 }
 

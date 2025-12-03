@@ -38,6 +38,8 @@ type Scene struct {
 	ChildrenWorld list.List
 	// 屏幕对象孩子
 	ChildrenScreen list.List
+	// 是否暂停
+	IsPause bool
 }
 
 var _ IObject = (*Scene)(nil)
@@ -78,16 +80,20 @@ func (s *Scene) Init() {
 	s.ChildrenScreen.Init()
 	// 我这里重写了AddChild所以需要设置Self
 	s.Object.Self = s
+	s.IsPause = false
 }
 
 // 处理事件
 func (s *Scene) HandleEvent(event *sdl.Event) {
-	s.Object.HandleEvent(event)
 	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
 		if e.Value.(IObject).GetIsActive() {
 			e.Value.(IObject).HandleEvent(event)
 		}
 	}
+	if s.IsPause {
+		return
+	}
+	s.Object.HandleEvent(event)
 	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
 		if e.Value.(IObject).GetIsActive() {
 			e.Value.(IObject).HandleEvent(event)
@@ -97,18 +103,21 @@ func (s *Scene) HandleEvent(event *sdl.Event) {
 
 // 更新
 func (s *Scene) Update(dt float32) {
-	s.Object.Update(dt)
-	for e := s.ChildrenWorld.Front(); e != nil; {
-		next := e.Next()
-		if e.Value.(IObject).GetNeedRemove() {
-			s.ChildrenWorld.Remove(e)
-			e.Value.(IObject).SetActive(false)
+	if !s.IsPause {
+		s.Object.Update(dt)
+		for e := s.ChildrenWorld.Front(); e != nil; {
+			next := e.Next()
+			if e.Value.(IObject).GetNeedRemove() {
+				s.ChildrenWorld.Remove(e)
+				e.Value.(IObject).SetActive(false)
+			}
+			if e.Value.(IObject).GetIsActive() {
+				e.Value.(IObject).Update(dt)
+			}
+			e = next
 		}
-		if e.Value.(IObject).GetIsActive() {
-			e.Value.(IObject).Update(dt)
-		}
-		e = next
 	}
+
 	for e := s.ChildrenScreen.Front(); e != nil; {
 		next := e.Next()
 		if e.Value.(IObject).GetNeedRemove() {
@@ -190,4 +199,18 @@ func (s *Scene) GetChildWorld() *list.List {
 // 获取屏幕对象孩子
 func (s *Scene) GetChildScreen() *list.List {
 	return &s.ChildrenScreen
+}
+
+// 暂停
+func (s *Scene) Pause() {
+	s.IsPause = true
+	s.Game().PauseAllMusic()
+	s.Game().PauseAllEffects()
+}
+
+// 恢复
+func (s *Scene) Resume() {
+	s.IsPause = false
+	s.Game().ResumeAllMusic()
+	s.Game().ResumeAllEffects()
 }

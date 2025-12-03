@@ -22,14 +22,23 @@ type SceneMain struct {
 	hudSkills *screen.HudSkill
 	// HUD分数
 	hudScore *screen.HudText
+	// 暂停按钮
+	buttonPause *screen.HudButton
+	// 重新游戏按钮
+	buttonRestart *screen.HudButton
+	// 退到标题场景按钮
+	buttonBack *screen.HudButton
 }
 
 var _ core.IObject = (*SceneMain)(nil)
 var _ core.IScene = (*SceneMain)(nil)
 
 func (s *SceneMain) Init() {
-	s.Game().PlayMusic("assets/bgm/OhMyGhost.ogg", true)
 	s.Scene.Init()
+	sdl.HideCursor()
+	s.Game().StopAllMusic()
+	s.Game().StopAllEffects()
+	s.Game().PlayMusic("assets/bgm/OhMyGhost.ogg", true)
 	s.WorldSize = s.Game().GetScreenSize().Mul(3.0)
 	s.CameraPositon = s.WorldSize.Mul(0.5).Sub(s.Game().GetScreenSize().Mul(0.5))
 
@@ -53,6 +62,11 @@ func (s *SceneMain) Init() {
 	// HUD分数
 	s.hudScore = screen.AddHudTextChild(s, "Score: 0", mgl32.Vec2{player.Game().GetScreenSize().X() - 120.0, 30.0}, mgl32.Vec2{200.0, 50.0},
 		"assets/font/VonwaonBitmap-16px.ttf", 32.0, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
+
+	s.buttonPause = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Add(mgl32.Vec2{-230.0, -30.0}), "assets/UI/A_Pause1.png", "assets/UI/A_Pause2.png", "assets/UI/A_Pause3.png", 1.0, core.AnchorTypeCenter)
+	s.buttonRestart = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Add(mgl32.Vec2{-140.0, -30.0}), "assets/UI/A_Restart1.png", "assets/UI/A_Restart2.png", "assets/UI/A_Restart3.png", 1.0, core.AnchorTypeCenter)
+	s.buttonBack = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Add(mgl32.Vec2{-50.0, -30.0}), "assets/UI/A_Back1.png", "assets/UI/A_Back2.png", "assets/UI/A_Back3.png", 1.0, core.AnchorTypeCenter)
+
 	// UI鼠标
 	s.uimouse = screen.AddUIMouseChild(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
 
@@ -74,6 +88,9 @@ func (s *SceneMain) HandleEvent(event *sdl.Event) {
 func (s *SceneMain) Update(dt float32) {
 	s.Scene.Update(dt)
 	s.updateScore()
+	s.checkButtonRestart()
+	s.checkButtonBack()
+	s.checkButtonPause()
 }
 
 func (s *SceneMain) Render() {
@@ -103,4 +120,41 @@ func (s *SceneMain) updateScore() {
 		return
 	}
 	s.hudScore.SetText("Score: " + strconv.Itoa(s.Game().GetScore()))
+}
+
+// 检查重新游戏按钮
+func (s *SceneMain) checkButtonRestart() {
+	if s.buttonRestart == nil {
+		return
+	}
+	if !s.buttonRestart.GetIsTrigger() {
+		return
+	}
+	s.Game().SafeChangeScene(s)
+}
+
+// 检查退到标题场景按钮
+func (s *SceneMain) checkButtonBack() {
+	if s.buttonBack == nil {
+		return
+	}
+	if !s.buttonBack.GetIsTrigger() {
+		return
+	}
+	s.Game().SafeChangeScene(&SceneTitle{})
+}
+
+// 检查暂停按钮
+func (s *SceneMain) checkButtonPause() {
+	if s.buttonPause == nil {
+		return
+	}
+	if !s.buttonPause.GetIsTrigger() {
+		return
+	}
+	if s.IsPause {
+		s.Resume()
+		return
+	}
+	s.Pause()
 }

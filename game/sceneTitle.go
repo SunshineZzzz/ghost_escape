@@ -34,6 +34,10 @@ var _ core.IScene = (*SceneTitle)(nil)
 // 初始化
 func (s *SceneTitle) Init() {
 	s.Scene.Init()
+	sdl.ShowCursor()
+	s.Game().StopAllMusic()
+	s.Game().StopAllEffects()
+	s.Game().PlayMusic("assets/bgm/Spooky music.mp3", true)
 	size := mgl32.Vec2{s.Game().GetScreenSize().X() / 2.0, s.Game().GetScreenSize().Y() / 3.0}
 	screen.AddHudTextChild(s, "幽 灵 逃 生", s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{0.0, -100}),
 		size, "assets/font/VonwaonBitmap-16px.ttf", 64, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)

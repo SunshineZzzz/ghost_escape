@@ -456,6 +456,11 @@ func (g *Game) PauseAllMusic() {
 	g.assetStore.PauseAllSound(SoundTypeMusic)
 }
 
+// 恢复所有音乐
+func (g *Game) ResumeAllMusic() {
+	g.assetStore.ResumeAllSound(SoundTypeMusic)
+}
+
 // 离开游戏
 func (g *Game) Quit() {
 	g.isRunning = false
