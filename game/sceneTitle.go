@@ -18,6 +18,12 @@ type SceneTitle struct {
 	boundaryColor sdl.FColor
 	// 颜色计时器
 	colorTimer float32
+	// 开始按钮
+	startButton *screen.HudButton
+	// 退出按钮
+	quitButton *screen.HudButton
+	// 贡献者名单按钮
+	creditButton *screen.HudButton
 }
 
 var _ core.IObject = (*SceneTitle)(nil)
@@ -32,6 +38,11 @@ func (s *SceneTitle) Init() {
 	scoreText := "最高分: " + strconv.Itoa(s.Game().GetHighScore())
 	screen.AddHudTextChild(s, scoreText, s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{0.0, 100}),
 		mgl32.Vec2{200, 50}, "assets/font/VonwaonBitmap-16px.ttf", 32, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
+
+	// 退出按钮
+	s.quitButton = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{200.0, 200.0}),
+		"assets/UI/A_Quit1.png", "assets/UI/A_Quit2.png", "assets/UI/A_Quit3.png", 2.0, core.AnchorTypeCenter)
+
 }
 
 // 处理事件
@@ -44,6 +55,7 @@ func (s *SceneTitle) Update(dt float32) {
 	s.Scene.Update(dt)
 	s.colorTimer += dt
 	s.updateColor()
+	s.checkButtonQuit()
 }
 
 func (s *SceneTitle) Render() {
@@ -67,4 +79,11 @@ func (s *SceneTitle) updateColor() {
 	s.boundaryColor.R = 0.5 + 0.5*float32(math.Sin(float64(s.colorTimer*0.9)))
 	s.boundaryColor.G = 0.5 + 0.5*float32(math.Sin(float64(s.colorTimer*0.8)))
 	s.boundaryColor.B = 0.5 + 0.5*float32(math.Sin(float64(s.colorTimer*0.7)))
+}
+
+// 检查退出按钮是否触发
+func (s *SceneTitle) checkButtonQuit() {
+	if s.quitButton.GetIsTrigger() {
+		s.Game().Quit()
+	}
 }

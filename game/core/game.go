@@ -447,3 +447,17 @@ func (g *Game) ResumeAllEffects() {
 func (g *Game) PauseAllMusic() {
 	g.assetStore.PauseAllSound(SoundTypeMusic)
 }
+
+// 离开游戏
+func (g *Game) Quit() {
+	g.isRunning = false
+}
+
+// 鼠标位置是否在矩形内
+func (g *Game) IsMouseInRect(topLeft, bottomRight mgl32.Vec2) bool {
+	if g.mousePosition.X() >= topLeft.X() && g.mousePosition.X() <= bottomRight.X() &&
+		g.mousePosition.Y() >= topLeft.Y() && g.mousePosition.Y() <= bottomRight.Y() {
+		return true
+	}
+	return false
+}
