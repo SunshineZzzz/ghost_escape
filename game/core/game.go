@@ -62,6 +62,10 @@ type Game struct {
 	mousePosition mgl32.Vec2
 	// 鼠标按钮状态
 	mouseButtons sdl.MouseButtonFlags
+	// 分数
+	score int
+	// 最高分
+	highScore int
 }
 
 func (g *Game) Init(title string, width, height int32, scene IScene) error {
@@ -369,4 +373,32 @@ func (g *Game) CreateTTFText(text string, fontPath string, fontSize float32) *tt
 		return nil
 	}
 	return ttf.CreateText(g.ttfEngine, font, text, 0)
+}
+
+// 设置分数
+func (g *Game) SetScore(score int) {
+	g.score = score
+	if score > g.highScore {
+		g.highScore = score
+	}
+}
+
+// 获取分数
+func (g *Game) GetScore() int {
+	return g.score
+}
+
+// 增加分数
+func (g *Game) AddScore(score int) {
+	g.SetScore(g.score + score)
+}
+
+// 获取最高分
+func (g *Game) GetHighScore() int {
+	return g.highScore
+}
+
+// 设置最高分
+func (g *Game) SetHighScore(highScore int) {
+	g.highScore = highScore
 }

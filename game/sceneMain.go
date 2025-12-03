@@ -3,6 +3,7 @@ package game
 import (
 	"ghost_escape/game/core"
 	"ghost_escape/game/screen"
+	"strconv"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
 	"github.com/go-gl/mathgl/mgl32"
@@ -19,6 +20,8 @@ type SceneMain struct {
 	hudStats *screen.HudStats
 	// HUD技能
 	hudSkills *screen.HudSkill
+	// HUD分数
+	hudScore *screen.HudText
 }
 
 var _ core.IObject = (*SceneMain)(nil)
@@ -42,12 +45,15 @@ func (s *SceneMain) Init() {
 	s.spawner = spawner
 	s.AddChild(spawner)
 
-	// UI鼠标
-	s.uimouse = screen.AddUIMouseChild(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
 	// HUD状态
 	s.hudStats = screen.AddHudStatsChild(s, &player.Actor, mgl32.Vec2{30.0, 30.0})
 	// HUD技能
 	s.hudSkills = screen.AddHudSkillChild(s, player, "assets/UI/Electric-Icon.png", mgl32.Vec2{player.Game().GetScreenSize().X() - 300.0, 30.0}, 0.14, core.AnchorTypeCenter)
+	// HUD分数
+	s.hudScore = screen.AddHudTextChild(s, "Score: 0", mgl32.Vec2{player.Game().GetScreenSize().X() - 120.0, 30.0}, mgl32.Vec2{200.0, 50.0},
+		"assets/font/VonwaonBitmap-16px.ttf", 32.0, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
+	// UI鼠标
+	s.uimouse = screen.AddUIMouseChild(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
 
 	// // 敌人
 	// enemy := &Enemy{}
@@ -66,6 +72,7 @@ func (s *SceneMain) HandleEvent(event *sdl.Event) {
 
 func (s *SceneMain) Update(dt float32) {
 	s.Scene.Update(dt)
+	s.updateScore()
 }
 
 func (s *SceneMain) Render() {
@@ -87,4 +94,12 @@ func (s *SceneMain) renderBackground() {
 	end := s.WorldToScreen(s.WorldSize)
 	s.Game().DrawGrid(start, end, 80.0, sdl.FColor{R: 0.5, G: 0.5, B: 0.5, A: 1.0})
 	s.Game().DrawBoundary(start, end, 5.0, sdl.FColor{R: 1.0, G: 1.0, B: 1.0, A: 1.0})
+}
+
+// 更新分数
+func (s *SceneMain) updateScore() {
+	if s.hudScore == nil {
+		return
+	}
+	s.hudScore.SetText("Score: " + strconv.Itoa(s.Game().GetScore()))
 }

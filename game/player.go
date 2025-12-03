@@ -38,7 +38,7 @@ func (p *Player) Init() {
 	p.Stats = core.AddStatusChild(&p.Actor, 100.0, 100.0, 40.0, 10.0)
 	// 雷武器组件
 	p.Weapon = AddWeaponThunderChild(&p.Actor, 2.0, 40.0)
-	affiliate.AddTextLabelChild(p, "这是主角", "assets/font/VonwaonBitmap-16px.ttf", 16.0, core.AnchorTypeCenter)
+	// affiliate.AddTextLabelChild(p, "这是主角", "assets/font/VonwaonBitmap-16px.ttf", 16.0, core.AnchorTypeCenter)
 }
 
 // 处理事件

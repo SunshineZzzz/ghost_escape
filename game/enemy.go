@@ -35,6 +35,8 @@ type Enemy struct {
 	spriteAnimDead *affiliate.SpriteAnim
 	// 当前精灵动画
 	currentSpriteAnim *affiliate.SpriteAnim
+	// 分数
+	score int
 }
 
 var _ core.IObject = (*Enemy)(nil)
@@ -55,6 +57,7 @@ func CreateEnemy(parent core.IObject, pos mgl32.Vec2, target *Player) *Enemy {
 // 初始化
 func (e *Enemy) Init() {
 	e.Actor.Init()
+	e.score = 10
 	e.currentState = EnemyStateNormal
 	e.spriteAnimNormal = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghost-Sheet.png", 2.0, core.AnchorTypeCenter)
 	e.spriteAnimHurt = affiliate.AddSpriteAnimChild(e, "assets/sprite/ghostHurt-Sheet.png", 2.0, core.AnchorTypeCenter)
@@ -132,6 +135,7 @@ func (e *Enemy) changeState(newState EnemyState) {
 	case EnemyStateDead:
 		e.currentSpriteAnim = e.spriteAnimDead
 		e.currentSpriteAnim.SetActive(true)
+		e.Game().AddScore(e.score)
 	}
 
 	e.currentState = newState
