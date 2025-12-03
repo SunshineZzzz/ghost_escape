@@ -28,6 +28,7 @@ var _ core.IObject = (*SceneMain)(nil)
 var _ core.IScene = (*SceneMain)(nil)
 
 func (s *SceneMain) Init() {
+	s.Game().PlayMusic("assets/bgm/OhMyGhost.ogg", true)
 	s.Scene.Init()
 	s.WorldSize = s.Game().GetScreenSize().Mul(3.0)
 	s.CameraPositon = s.WorldSize.Mul(0.5).Sub(s.Game().GetScreenSize().Mul(0.5))

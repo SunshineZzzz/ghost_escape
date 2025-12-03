@@ -5,11 +5,22 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"unsafe"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
 	"github.com/hajimehoshi/go-mp3"
 	"github.com/jfreymuth/oggvorbis"
+)
+
+// 声音类型
+type SoundType int
+
+const (
+	// 音效
+	SoundTypeEffect SoundType = iota
+	// 音乐
+	SoundTypeMusic
 )
 
 // 声音抽象
@@ -18,26 +29,30 @@ type ISound interface {
 	Play()
 	// 暂停声音
 	Pause()
+	// 恢复声音
+	Resume()
 	// 停止声音
 	Stop()
 	// 设置是否循环播放
 	SetLoop(loop bool)
 	// 关闭声音
 	Close()
+	// 获取声音类型
+	GetSoundType() SoundType
 }
 
 // 创建声音
-func NewSound(soundFilePath string) (ISound, error) {
+func NewSound(soundFilePath string, soundType SoundType) (ISound, error) {
 	extWithDot := filepath.Ext(soundFilePath)
 	ext := strings.ToLower(extWithDot[1:])
 
 	switch ext {
 	case "ogg":
-		return newOggSound(soundFilePath)
+		return newOggSound(soundFilePath, soundType)
 	case "wav":
-		return newWavSound(soundFilePath)
+		return newWavSound(soundFilePath, soundType)
 	case "mp3":
-		return newMp3Sound(soundFilePath)
+		return newMp3Sound(soundFilePath, soundType)
 	default:
 		return nil, fmt.Errorf("unsupported audio file format: %s", extWithDot)
 	}
@@ -45,16 +60,38 @@ func NewSound(soundFilePath string) (ISound, error) {
 
 // 全局声音句柄管理
 var soundHandles = struct {
+	sync.RWMutex
 	handles map[uint32]ISound
 	nextID  uint32
 }{
+
 	handles: make(map[uint32]ISound),
 	nextID:  1,
 }
 
 // 注册声音
 func registerSound(sound ISound) uint32 {
+	soundHandles.Lock()
+	defer soundHandles.Unlock()
+
 	id := soundHandles.nextID
+	if _, ok := soundHandles.handles[id]; ok {
+		tryCount := 0
+		tryMax := 10000
+		//lint:ignore S1006 循环查找可用ID
+		for true {
+			tryCount++
+			if tryCount >= tryMax {
+				panic("register sound failed, max try count reached")
+			}
+			if _, ok := soundHandles.handles[id]; ok {
+				soundHandles.nextID++
+				id = soundHandles.nextID
+				continue
+			}
+			break
+		}
+	}
 	soundHandles.handles[id] = sound
 	soundHandles.nextID++
 	return id
@@ -62,16 +99,26 @@ func registerSound(sound ISound) uint32 {
 
 // 获取声音
 func getSound(id uint32) ISound {
+	soundHandles.RLock()
+	defer soundHandles.RUnlock()
+
 	return soundHandles.handles[id]
 }
 
 // 注销声音
 func unregisterSound(id uint32) {
+	soundHandles.Lock()
+	defer soundHandles.Unlock()
+
 	delete(soundHandles.handles, id)
 }
 
 // OGG格式声音
 type oggSound struct {
+	// 锁
+	sync.Mutex
+	// 声音类型
+	soundType SoundType
 	// SDL音频流
 	stream *sdl.AudioStream
 	// ogg音频数据
@@ -91,7 +138,7 @@ type oggSound struct {
 
 var _ ISound = (*oggSound)(nil)
 
-func newOggSound(soundFilePath string) (*oggSound, error) {
+func newOggSound(soundFilePath string, soundType SoundType) (*oggSound, error) {
 	file, err := os.Open(soundFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open sound file, %v, %v", soundFilePath, err)
@@ -124,6 +171,7 @@ func newOggSound(soundFilePath string) (*oggSound, error) {
 
 	callback := sdl.NewAudioStreamCallback(oggAudioCallback)
 	ogg := &oggSound{
+		soundType:  soundType,
 		audioData:  Float32ToBytes(pcmData[:totalSamples]),
 		dataPos:    0,
 		isPlaying:  false,
@@ -154,7 +202,14 @@ func oggAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 	ogg := getSound(id).(*oggSound)
 
 	// 安全检查
-	if ogg == nil || ogg.id != id || !ogg.isPlaying || len(ogg.audioData) == 0 {
+	if ogg == nil {
+		return
+	}
+
+	ogg.Lock()
+	defer ogg.Unlock()
+
+	if ogg.id != id || !ogg.isPlaying || len(ogg.audioData) == 0 {
 		return
 	}
 
@@ -167,6 +222,7 @@ func oggAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 		} else {
 			ogg.isPlaying = false
 			sdl.AudioStreamDevicePaused(stream)
+			sdl.ClearAudioStream(stream)
 			return
 		}
 	}
@@ -188,16 +244,23 @@ func oggAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 
 // 播放
 func (o *oggSound) Play() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream == nil || o.id == 0 {
 		return
 	}
 	o.isPlaying = true
 	o.dataPos = 0
+	sdl.ClearAudioStream(o.stream)
 	sdl.ResumeAudioStreamDevice(o.stream)
 }
 
 // 暂停
 func (o *oggSound) Pause() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream == nil || o.id == 0 {
 		return
 	}
@@ -205,8 +268,23 @@ func (o *oggSound) Pause() {
 	sdl.AudioStreamDevicePaused(o.stream)
 }
 
+// 恢复
+func (o *oggSound) Resume() {
+	o.Lock()
+	defer o.Unlock()
+
+	if o.stream == nil || o.id == 0 {
+		return
+	}
+	o.isPlaying = true
+	sdl.ResumeAudioStreamDevice(o.stream)
+}
+
 // 停止
 func (o *oggSound) Stop() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream == nil || o.id == 0 {
 		return
 	}
@@ -218,11 +296,17 @@ func (o *oggSound) Stop() {
 
 // 设置循环播放
 func (o *oggSound) SetLoop(loop bool) {
+	o.Lock()
+	defer o.Unlock()
+
 	o.loop = loop
 }
 
 // 关闭播放器，释放资源
 func (o *oggSound) Close() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream != nil {
 		o.Stop()
 		sdl.DestroyAudioStream(o.stream)
@@ -231,8 +315,20 @@ func (o *oggSound) Close() {
 	unregisterSound(o.id)
 }
 
+// 获取声音类型
+func (o *oggSound) GetSoundType() SoundType {
+	o.Lock()
+	defer o.Unlock()
+
+	return o.soundType
+}
+
 // wav格式声音
 type wavSound struct {
+	// 锁
+	sync.Mutex
+	// 声音类型
+	soundType SoundType
 	// SDL音频流
 	stream *sdl.AudioStream
 	// wav音频数据
@@ -251,7 +347,7 @@ type wavSound struct {
 	id uint32
 }
 
-func newWavSound(soundFilePath string) (*wavSound, error) {
+func newWavSound(soundFilePath string, soundType SoundType) (*wavSound, error) {
 	// 打开文件IO流
 	ioStream := sdl.IOFromFile(soundFilePath, "rb")
 	if ioStream == nil {
@@ -271,6 +367,7 @@ func newWavSound(soundFilePath string) (*wavSound, error) {
 	}
 
 	wav := &wavSound{
+		soundType: soundType,
 		audioBuf:  audioBuf,
 		audioLen:  int(audioLen),
 		spec:      spec,
@@ -305,7 +402,14 @@ func wavAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 	wav := getSound(id).(*wavSound)
 
 	// 安全检查
-	if wav == nil || wav.id != id || !wav.isPlaying || wav.audioLen == 0 {
+	if wav == nil {
+		return
+	}
+
+	wav.Lock()
+	defer wav.Unlock()
+
+	if wav.id != id || !wav.isPlaying || wav.audioLen == 0 {
 		return
 	}
 
@@ -318,6 +422,7 @@ func wavAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 		} else {
 			wav.isPlaying = false
 			sdl.AudioStreamDevicePaused(stream)
+			sdl.ClearAudioStream(stream)
 			return
 		}
 	}
@@ -340,15 +445,23 @@ func wavAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 
 // 播放控制方法（保持不变）
 func (w *wavSound) Play() {
+	w.Lock()
+	defer w.Unlock()
+
 	if w.stream == nil || w.id == 0 {
 		return
 	}
 	w.isPlaying = true
 	w.dataPos = 0
+	sdl.ClearAudioStream(w.stream)
 	sdl.ResumeAudioStreamDevice(w.stream)
 }
 
+// 暂停
 func (w *wavSound) Pause() {
+	w.Lock()
+	defer w.Unlock()
+
 	if w.stream == nil || w.id == 0 {
 		return
 	}
@@ -356,7 +469,23 @@ func (w *wavSound) Pause() {
 	sdl.AudioStreamDevicePaused(w.stream)
 }
 
+// 恢复
+func (w *wavSound) Resume() {
+	w.Lock()
+	defer w.Unlock()
+
+	if w.stream == nil || w.id == 0 {
+		return
+	}
+	w.isPlaying = true
+	sdl.ResumeAudioStreamDevice(w.stream)
+}
+
+// 停止
 func (w *wavSound) Stop() {
+	w.Lock()
+	defer w.Unlock()
+
 	if w.stream == nil || w.id == 0 {
 		return
 	}
@@ -366,12 +495,19 @@ func (w *wavSound) Stop() {
 	sdl.ClearAudioStream(w.stream)
 }
 
+// 设置循环播放
 func (w *wavSound) SetLoop(loop bool) {
+	w.Lock()
+	defer w.Unlock()
+
 	w.loop = loop
 }
 
 // 关闭播放器，释放资源
 func (w *wavSound) Close() {
+	w.Lock()
+	defer w.Unlock()
+
 	if w.stream != nil {
 		w.Stop()
 		sdl.DestroyAudioStream(w.stream)
@@ -385,8 +521,20 @@ func (w *wavSound) Close() {
 	unregisterSound(w.id)
 }
 
+// 获取声音类型
+func (w *wavSound) GetSoundType() SoundType {
+	w.Lock()
+	defer w.Unlock()
+
+	return w.soundType
+}
+
 // mp3格式声音
 type mp3Sound struct {
+	// 锁
+	sync.Mutex
+	// 声音类型
+	soundType SoundType
 	// SDL音频流
 	stream *sdl.AudioStream
 	// MP3音频数据
@@ -406,7 +554,7 @@ type mp3Sound struct {
 
 var _ ISound = (*mp3Sound)(nil)
 
-func newMp3Sound(soundFilePath string) (*mp3Sound, error) {
+func newMp3Sound(soundFilePath string, soundType SoundType) (*mp3Sound, error) {
 	file, err := os.Open(soundFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open sound file, %v, %v", soundFilePath, err)
@@ -439,6 +587,7 @@ func newMp3Sound(soundFilePath string) (*mp3Sound, error) {
 
 	callback := sdl.NewAudioStreamCallback(mp3AudioCallback)
 	mp3 := &mp3Sound{
+		soundType:  soundType,
 		audioData:  pcmData,
 		dataPos:    0,
 		isPlaying:  false,
@@ -469,7 +618,14 @@ func mp3AudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 	mp3 := getSound(id).(*mp3Sound)
 
 	// 安全检查
-	if mp3 == nil || mp3.id != id || !mp3.isPlaying || len(mp3.audioData) == 0 {
+	if mp3 == nil {
+		return
+	}
+
+	mp3.Lock()
+	defer mp3.Unlock()
+
+	if mp3.id != id || !mp3.isPlaying || len(mp3.audioData) == 0 {
 		return
 	}
 
@@ -482,6 +638,7 @@ func mp3AudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 		} else {
 			mp3.isPlaying = false
 			sdl.AudioStreamDevicePaused(stream)
+			sdl.ClearAudioStream(stream)
 			return
 		}
 	}
@@ -503,16 +660,23 @@ func mp3AudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 
 // 播放
 func (o *mp3Sound) Play() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream == nil || o.id == 0 {
 		return
 	}
 	o.isPlaying = true
 	o.dataPos = 0
+	sdl.ClearAudioStream(o.stream)
 	sdl.ResumeAudioStreamDevice(o.stream)
 }
 
 // 暂停
 func (o *mp3Sound) Pause() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream == nil || o.id == 0 {
 		return
 	}
@@ -520,8 +684,23 @@ func (o *mp3Sound) Pause() {
 	sdl.AudioStreamDevicePaused(o.stream)
 }
 
+// 恢复
+func (o *mp3Sound) Resume() {
+	o.Lock()
+	defer o.Unlock()
+
+	if o.stream == nil || o.id == 0 {
+		return
+	}
+	o.isPlaying = true
+	sdl.ResumeAudioStreamDevice(o.stream)
+}
+
 // 停止
 func (o *mp3Sound) Stop() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream == nil || o.id == 0 {
 		return
 	}
@@ -533,15 +712,29 @@ func (o *mp3Sound) Stop() {
 
 // 设置循环播放
 func (o *mp3Sound) SetLoop(loop bool) {
+	o.Lock()
+	defer o.Unlock()
+
 	o.loop = loop
 }
 
 // 关闭播放器，释放资源
 func (o *mp3Sound) Close() {
+	o.Lock()
+	defer o.Unlock()
+
 	if o.stream != nil {
 		o.Stop()
 		sdl.DestroyAudioStream(o.stream)
 		o.stream = nil
 	}
 	unregisterSound(o.id)
+}
+
+// 获取声音类型
+func (o *mp3Sound) GetSoundType() SoundType {
+	o.Lock()
+	defer o.Unlock()
+
+	return o.soundType
 }

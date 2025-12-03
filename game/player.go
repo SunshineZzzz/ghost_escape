@@ -132,3 +132,12 @@ func (p *Player) GetSkillPercent() float32 {
 	}
 	return 1.0
 }
+
+// 被伤害
+func (p *Player) TakeDamage(damage float32) {
+	if p.Stats == nil || p.Stats.GetInvincible() {
+		return
+	}
+	p.Actor.TakeDamage(damage)
+	p.Game().PlaySound("assets/sound/hit-flesh-02-266309.mp3", false)
+}

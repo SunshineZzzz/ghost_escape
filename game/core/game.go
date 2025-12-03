@@ -402,3 +402,48 @@ func (g *Game) GetHighScore() int {
 func (g *Game) SetHighScore(highScore int) {
 	g.highScore = highScore
 }
+
+// 播放音乐
+func (g *Game) PlayMusic(musicPath string, loop bool) {
+	music, err := g.assetStore.GetSound(musicPath, SoundTypeMusic)
+	if err != nil {
+		return
+	}
+	music.SetLoop(loop)
+	music.Play()
+}
+
+// 播放音效
+func (g *Game) PlaySound(soundPath string, loop bool) {
+	sound, err := g.assetStore.GetSound(soundPath, SoundTypeEffect)
+	if err != nil {
+		return
+	}
+	sound.SetLoop(loop)
+	sound.Play()
+}
+
+// 停止所有音乐
+func (g *Game) StopAllMusic() {
+	g.assetStore.StopAllSound(SoundTypeMusic)
+}
+
+// 停止所有音效
+func (g *Game) StopAllEffects() {
+	g.assetStore.StopAllSound(SoundTypeEffect)
+}
+
+// 暂停所有音效
+func (g *Game) PauseAllEffects() {
+	g.assetStore.PauseAllSound(SoundTypeEffect)
+}
+
+// 恢复所有音效
+func (g *Game) ResumeAllEffects() {
+	g.assetStore.ResumeAllSound(SoundTypeEffect)
+}
+
+// 暂停所有音乐
+func (g *Game) PauseAllMusic() {
+	g.assetStore.PauseAllSound(SoundTypeMusic)
+}

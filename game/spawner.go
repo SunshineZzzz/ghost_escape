@@ -35,6 +35,9 @@ func (s *Spawner) Update(dt float32) {
 	if s.timer >= s.interval {
 		s.timer = 0.0
 		// s.num = 1
+		if s.num > 0 {
+			s.Game().PlaySound("assets/sound/silly-ghost-sound-242342.mp3", false)
+		}
 		for i := 0; i < s.num; i++ {
 			pos := core.GetInstance().RandVec2(
 				core.GetInstance().GetCurrentScene().GetCameraPosition(),

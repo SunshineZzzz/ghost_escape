@@ -8,6 +8,8 @@ import (
 type IActor interface {
 	// 获取技能使用恢复百分比
 	GetSkillPercent() float32
+	// 被伤害
+	TakeDamage(float32)
 }
 
 // 基础角色

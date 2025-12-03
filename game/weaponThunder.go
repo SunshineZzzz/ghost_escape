@@ -36,6 +36,7 @@ func (w *WeaponThunder) HandleEvent(event *sdl.Event) {
 	if event.Type() == sdl.EventMouseButtonDown {
 		if event.Button().Button == uint8(sdl.ButtonLeft) {
 			if w.CanAttack() {
+				w.Game().PlaySound("assets/sound/big-thunder.mp3", false)
 				pos := core.GetInstance().GetMousePosition().Add(core.GetInstance().GetCurrentScene().GetCameraPosition())
 				spell := world.AddSpellChild(nil, "assets/effect/Thunderstrike w blur.png", pos, 40.0, 3.0, core.AnchorTypeCenter)
 				// 攻击
