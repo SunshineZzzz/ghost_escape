@@ -1,8 +1,10 @@
 package core
 
 import (
+	"bufio"
 	"fmt"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -66,6 +68,8 @@ type Game struct {
 	score int
 	// 最高分
 	highScore int
+	// 下一个场景
+	nextScene IScene
 }
 
 func (g *Game) Init(title string, width, height int32, scene IScene) error {
@@ -108,6 +112,10 @@ func (g *Game) Run() {
 	// 主循环
 	for g.isRunning {
 		start := sdl.GetTicksNS()
+		if g.nextScene != nil {
+			g.ChangeScene(g.nextScene)
+			g.nextScene = nil
+		}
 		g.handleEvent()
 		g.update(g.dt)
 		g.render()
@@ -460,4 +468,35 @@ func (g *Game) IsMouseInRect(topLeft, bottomRight mgl32.Vec2) bool {
 		return true
 	}
 	return false
+}
+
+// 从文件中加载文本
+func (g *Game) LoadTextFromFile(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	text := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		text += line + "\n"
+	}
+	return text, nil
+}
+
+// 安全切换场景
+func (g *Game) SafeChangeScene(scene IScene) {
+	g.nextScene = scene
+}
+
+// 切换场景
+func (g *Game) ChangeScene(scene IScene) {
+	if g.currentScene != nil {
+		g.currentScene.Clean()
+	}
+	g.currentScene = scene
+	g.currentScene.Init()
 }

@@ -58,3 +58,9 @@ func (h *HudText) SetText(text string) {
 	}
 	h.textLabel.SetText(text)
 }
+
+// 根据文本设置背景大小
+func (h *HudText) SetBgSizeByText(margin float32) {
+	textSize := h.textLabel.GetSize()
+	h.setBgSize(mgl32.Vec2{textSize.X() + margin, textSize.Y() + margin})
+}

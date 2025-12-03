@@ -23,7 +23,9 @@ type SceneTitle struct {
 	// 退出按钮
 	quitButton *screen.HudButton
 	// 贡献者名单按钮
-	creditButton *screen.HudButton
+	creditsButton *screen.HudButton
+	// 贡献者名单文本
+	creditsText *screen.HudText
 }
 
 var _ core.IObject = (*SceneTitle)(nil)
@@ -39,23 +41,48 @@ func (s *SceneTitle) Init() {
 	screen.AddHudTextChild(s, scoreText, s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{0.0, 100}),
 		mgl32.Vec2{200, 50}, "assets/font/VonwaonBitmap-16px.ttf", 32, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
 
+	// 开始按钮
+	s.startButton = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{-200.0, 200.0}),
+		"assets/UI/A_Start1.png", "assets/UI/A_Start2.png", "assets/UI/A_Start3.png", 2.0, core.AnchorTypeCenter)
+	// 贡献者名单按钮
+	s.creditsButton = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{0, 200.0}),
+		"assets/UI/A_Credits1.png", "assets/UI/A_Credits2.png", "assets/UI/A_Credits3.png", 2.0, core.AnchorTypeCenter)
 	// 退出按钮
 	s.quitButton = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{200.0, 200.0}),
 		"assets/UI/A_Quit1.png", "assets/UI/A_Quit2.png", "assets/UI/A_Quit3.png", 2.0, core.AnchorTypeCenter)
 
+	text, err := s.Game().LoadTextFromFile("assets/credits.txt")
+	if err != nil {
+		return
+	}
+	s.creditsText = screen.AddHudTextChild(s, text, s.Game().GetScreenSize().Mul(0.5),
+		mgl32.Vec2{500, 500}, "assets/font/VonwaonBitmap-16px.ttf", 16, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
+	s.creditsText.SetActive(false)
+	s.creditsText.SetBgSizeByText(50.0)
 }
 
 // 处理事件
 func (s *SceneTitle) HandleEvent(event *sdl.Event) {
+	if s.creditsText.GetIsActive() {
+		if event.Type() == sdl.EventMouseButtonUp {
+			s.creditsText.SetActive(false)
+		}
+		return
+	}
 	s.Scene.HandleEvent(event)
 }
 
 // 更新
 func (s *SceneTitle) Update(dt float32) {
-	s.Scene.Update(dt)
 	s.colorTimer += dt
 	s.updateColor()
+	if s.creditsText.GetIsActive() {
+		return
+	}
+	s.Scene.Update(dt)
 	s.checkButtonQuit()
+	s.checkButtonStart()
+	s.checkButtonCredits()
 }
 
 func (s *SceneTitle) Render() {
@@ -85,5 +112,19 @@ func (s *SceneTitle) updateColor() {
 func (s *SceneTitle) checkButtonQuit() {
 	if s.quitButton.GetIsTrigger() {
 		s.Game().Quit()
+	}
+}
+
+// 检查开始按钮是否触发
+func (s *SceneTitle) checkButtonStart() {
+	if s.startButton.GetIsTrigger() {
+		s.Game().SafeChangeScene(&SceneMain{})
+	}
+}
+
+// 检查贡献者名单按钮是否触发
+func (s *SceneTitle) checkButtonCredits() {
+	if s.creditsButton.GetIsTrigger() {
+		s.creditsText.SetActive(true)
 	}
 }

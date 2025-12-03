@@ -42,11 +42,11 @@ func (s *Collider) Init() {
 // 渲染碰撞器
 func (s *Collider) Render() {
 	s.ObjectAffiliate.Render()
-	if s.GetColliderType() == core.ColliderTypeCircle {
-		pos := s.Parent.GetRenderPosition().Add(s.Offset)
-		// 圆形碰撞器渲染
-		s.Game().RenderFillCircle(pos, s.Size, 0.3)
-	}
+	// if s.GetColliderType() == core.ColliderTypeCircle {
+	// 	pos := s.Parent.GetRenderPosition().Add(s.Offset)
+	// 	// 圆形碰撞器渲染
+	// 	s.Game().RenderFillCircle(pos, s.Size, 0.3)
+	// }
 }
 
 // 是否发生碰撞

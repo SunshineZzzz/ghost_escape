@@ -67,17 +67,16 @@ func (t *TextLabel) SetFont(fontPath string, fontSize float32) {
 	}
 	t.ttfText = t.Game().CreateTTFText("", fontPath, fontSize)
 	ttf.SetTextFont(t.ttfText, font)
+	t.updateSize()
 }
 
 // 设置字体路径
 func (t *TextLabel) SetFontPath(fontPath string) {
-	t.Clear()
 	t.SetFont(fontPath, t.fontSize)
 }
 
 // 设置字体大小
 func (t *TextLabel) SetFontSize(fontSize float32) {
-	t.Clear()
 	t.SetFont(t.fontPath, fontSize)
 }
 
@@ -87,6 +86,7 @@ func (t *TextLabel) SetText(text string) {
 		return
 	}
 	ttf.SetTextString(t.ttfText, text, uint64(len(text)))
+	t.updateSize()
 }
 
 // 更新文本大小
