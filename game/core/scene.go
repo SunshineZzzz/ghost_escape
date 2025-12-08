@@ -24,6 +24,10 @@ type IScene interface {
 	GetChildWorld() *list.List
 	// 获取屏幕对象孩子
 	GetChildScreen() *list.List
+	// 加载数据
+	LoadData(string)
+	// 保存数据
+	SaveData(string)
 }
 
 // 基础场景
@@ -213,4 +217,14 @@ func (s *Scene) Resume() {
 	s.IsPause = false
 	s.Game().ResumeAllMusic()
 	s.Game().ResumeAllEffects()
+}
+
+// 加载数据
+func (s *Scene) LoadData(string) {
+	panic("not implemented")
+}
+
+// 保存数据
+func (s *Scene) SaveData(string) {
+	panic("not implemented")
 }

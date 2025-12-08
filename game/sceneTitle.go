@@ -1,9 +1,11 @@
 package game
 
 import (
+	"encoding/binary"
 	"ghost_escape/game/core"
 	"ghost_escape/game/screen"
 	"math"
+	"os"
 	"strconv"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
@@ -34,6 +36,7 @@ var _ core.IScene = (*SceneTitle)(nil)
 // 初始化
 func (s *SceneTitle) Init() {
 	s.Scene.Init()
+	s.LoadData("assets/score.dat")
 	sdl.ShowCursor()
 	s.Game().StopAllMusic()
 	s.Game().StopAllEffects()
@@ -131,4 +134,20 @@ func (s *SceneTitle) checkButtonCredits() {
 	if s.creditsButton.GetIsTrigger() {
 		s.creditsText.SetActive(true)
 	}
+}
+
+// 加载数据
+func (s *SceneTitle) LoadData(filePath string) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	var highScore int32
+	err = binary.Read(file, binary.LittleEndian, &highScore)
+	if err != nil {
+		return
+	}
+	s.Game().SetHighScore(int(highScore))
 }

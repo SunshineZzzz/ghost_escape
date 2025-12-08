@@ -1,8 +1,10 @@
 package game
 
 import (
+	"encoding/binary"
 	"ghost_escape/game/core"
 	"ghost_escape/game/screen"
+	"os"
 	"strconv"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
@@ -100,6 +102,7 @@ func (s *SceneMain) Update(dt float32) {
 	s.checkButtonPause()
 	if s.player != nil && !s.player.GetActive() {
 		s.endTimer.Start()
+		s.SaveData("assets/score.dat")
 	}
 	s.checkEndTimer()
 }
@@ -141,6 +144,7 @@ func (s *SceneMain) checkButtonRestart() {
 	if !s.buttonRestart.GetIsTrigger() {
 		return
 	}
+	s.SaveData("assets/score.dat")
 	s.Game().SetScore(0)
 	s.Game().SafeChangeScene(s)
 }
@@ -153,6 +157,7 @@ func (s *SceneMain) checkButtonBack() {
 	if !s.buttonBack.GetIsTrigger() {
 		return
 	}
+	s.SaveData("assets/score.dat")
 	s.Game().SetScore(0)
 	s.Game().SafeChangeScene(&SceneTitle{})
 }
@@ -184,4 +189,18 @@ func (s *SceneMain) checkEndTimer() {
 	s.buttonBack.SetScale(4.0)
 	s.buttonPause.SetActive(false)
 	s.endTimer.Stop()
+}
+
+// 保存数据
+func (s *SceneMain) SaveData(filePath string) {
+	highScore := s.Game().GetHighScore()
+	file, err := os.Create(filePath)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	err = binary.Write(file, binary.LittleEndian, int32(highScore))
+	if err != nil {
+		return
+	}
 }
