@@ -505,3 +505,22 @@ func (g *Game) ChangeScene(scene IScene) {
 	g.currentScene = scene
 	g.currentScene.Init()
 }
+
+// 绘制点们
+func (g *Game) DrawPoints(points *[]mgl32.Vec2, renderPos mgl32.Vec2, color sdl.FColor) {
+	sdl.SetRenderDrawColorFloat(g.sdlRenderer, color.R, color.G, color.B, color.A)
+	screenRect := sdl.FRect{
+		X: 0.0,
+		Y: 0.0,
+		W: g.screenSize.X(),
+		H: g.screenSize.Y(),
+	}
+	for _, p := range *points {
+		pos := sdl.FPoint{X: p.X() + renderPos.X(), Y: p.Y() + renderPos.Y()}
+		if !sdl.PointInRectFloat(pos, screenRect) {
+			continue
+		}
+		sdl.RenderPoint(g.sdlRenderer, pos.X, pos.Y)
+	}
+	sdl.SetRenderDrawColorFloat(g.sdlRenderer, 0, 0, 0, 1)
+}

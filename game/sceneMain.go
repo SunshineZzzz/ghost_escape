@@ -3,6 +3,7 @@ package game
 import (
 	"encoding/binary"
 	"ghost_escape/game/core"
+	"ghost_escape/game/raw"
 	"ghost_escape/game/screen"
 	"os"
 	"strconv"
@@ -53,6 +54,9 @@ func (s *SceneMain) Init() {
 	s.player.Init()
 	s.player.SetPosition(s.WorldSize.Mul(0.5))
 	s.AddChild(s.player)
+
+	// 增加视差星空背景
+	raw.AddBgStarChild(s, 200, 0.2, 0.5, 0.7)
 
 	// 生成器
 	spawner := &Spawner{}
