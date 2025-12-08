@@ -85,7 +85,7 @@ func (s *Scene) Init() {
 
 // 处理事件
 func (s *Scene) HandleEvent(event *sdl.Event) {
-	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
+	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
 		if e.Value.(IObject).GetIsActive() {
 			e.Value.(IObject).HandleEvent(event)
 		}
@@ -94,7 +94,7 @@ func (s *Scene) HandleEvent(event *sdl.Event) {
 		return
 	}
 	s.Object.HandleEvent(event)
-	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
+	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
 		if e.Value.(IObject).GetIsActive() {
 			e.Value.(IObject).HandleEvent(event)
 		}
