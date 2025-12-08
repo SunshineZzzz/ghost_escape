@@ -115,3 +115,10 @@ func (b *HudButton) GetIsTrigger() bool {
 	}
 	return false
 }
+
+// 设置缩放
+func (b *HudButton) SetScale(scale float32) {
+	b.normalSprite.SetScale(scale)
+	b.hoverSprite.SetScale(scale)
+	b.pressSprite.SetScale(scale)
+}

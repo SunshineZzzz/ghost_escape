@@ -67,7 +67,7 @@ func (s *SceneTitle) Init() {
 
 // 处理事件
 func (s *SceneTitle) HandleEvent(event *sdl.Event) {
-	if s.creditsText.GetIsActive() {
+	if s.creditsText.GetActive() {
 		if event.Type() == sdl.EventMouseButtonUp {
 			s.creditsText.SetActive(false)
 		}
@@ -80,7 +80,7 @@ func (s *SceneTitle) HandleEvent(event *sdl.Event) {
 func (s *SceneTitle) Update(dt float32) {
 	s.colorTimer += dt
 	s.updateColor()
-	if s.creditsText.GetIsActive() {
+	if s.creditsText.GetActive() {
 		return
 	}
 	s.Scene.Update(dt)

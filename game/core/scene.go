@@ -86,7 +86,7 @@ func (s *Scene) Init() {
 // 处理事件
 func (s *Scene) HandleEvent(event *sdl.Event) {
 	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).HandleEvent(event)
 		}
 	}
@@ -95,7 +95,7 @@ func (s *Scene) HandleEvent(event *sdl.Event) {
 	}
 	s.Object.HandleEvent(event)
 	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).HandleEvent(event)
 		}
 	}
@@ -111,7 +111,7 @@ func (s *Scene) Update(dt float32) {
 				s.ChildrenWorld.Remove(e)
 				e.Value.(IObject).SetActive(false)
 			}
-			if e.Value.(IObject).GetIsActive() {
+			if e.Value.(IObject).GetActive() {
 				e.Value.(IObject).Update(dt)
 			}
 			e = next
@@ -124,7 +124,7 @@ func (s *Scene) Update(dt float32) {
 			s.ChildrenScreen.Remove(e)
 			e.Value.(IObject).SetActive(false)
 		}
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).Update(dt)
 		}
 		e = next
@@ -135,12 +135,12 @@ func (s *Scene) Update(dt float32) {
 func (s *Scene) Render() {
 	s.Object.Render()
 	for e := s.ChildrenWorld.Front(); e != nil; e = e.Next() {
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).Render()
 		}
 	}
 	for e := s.ChildrenScreen.Front(); e != nil; e = e.Next() {
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).Render()
 		}
 	}

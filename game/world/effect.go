@@ -22,7 +22,7 @@ var _ core.IObjectScreen = (*Effect)(nil)
 var _ core.IObjectWorld = (*Effect)(nil)
 
 // 创建特效
-func AddEffect(parent core.IObject, filePath string, pos mgl32.Vec2, scale float32, anchorType core.AnchorType, nextObject core.IObjectWorld) *Effect {
+func AddEffectChild(parent core.IObject, filePath string, pos mgl32.Vec2, scale float32, anchorType core.AnchorType, nextObject core.IObjectWorld) *Effect {
 	effect := &Effect{}
 	effect.Init()
 	effect.spriteAnim = affiliate.AddSpriteAnimChild(effect, filePath, scale, anchorType)

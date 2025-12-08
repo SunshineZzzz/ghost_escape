@@ -27,7 +27,7 @@ type IObject interface {
 	// 设置对象类型
 	SetType(ObjectType)
 	// 获取是否活跃
-	GetIsActive() bool
+	GetActive() bool
 	// 设置是否活跃
 	SetActive(bool)
 	// 获取是否需要移除
@@ -68,7 +68,7 @@ func (o *Object) Init() {
 // 处理事件
 func (o *Object) HandleEvent(event *sdl.Event) {
 	for e := o.Children.Front(); e != nil; e = e.Next() {
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).HandleEvent(event)
 		}
 	}
@@ -93,7 +93,7 @@ func (o *Object) Update(dt float32) {
 			o.Children.Remove(e)
 			e.Value.(IObject).SetActive(false)
 		}
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).Update(dt)
 		}
 		e = next
@@ -104,7 +104,7 @@ func (o *Object) Update(dt float32) {
 func (o *Object) Render() {
 	// 渲染子对象
 	for e := o.Children.Front(); e != nil; e = e.Next() {
-		if e.Value.(IObject).GetIsActive() {
+		if e.Value.(IObject).GetActive() {
 			e.Value.(IObject).Render()
 		}
 	}
@@ -150,7 +150,7 @@ func (o *Object) SetType(t ObjectType) {
 }
 
 // 获取是否活跃
-func (o *Object) GetIsActive() bool {
+func (o *Object) GetActive() bool {
 	return o.IsActive
 }
 

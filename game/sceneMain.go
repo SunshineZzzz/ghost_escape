@@ -28,6 +28,10 @@ type SceneMain struct {
 	buttonRestart *screen.HudButton
 	// 退到标题场景按钮
 	buttonBack *screen.HudButton
+	// 游戏结束timer
+	endTimer *core.Timer
+	// 玩家
+	player *Player
 }
 
 var _ core.IObject = (*SceneMain)(nil)
@@ -43,24 +47,24 @@ func (s *SceneMain) Init() {
 	s.CameraPositon = s.WorldSize.Mul(0.5).Sub(s.Game().GetScreenSize().Mul(0.5))
 
 	// 玩家
-	player := &Player{}
-	player.Init()
-	player.SetPosition(s.WorldSize.Mul(0.5))
-	s.AddChild(player)
+	s.player = &Player{}
+	s.player.Init()
+	s.player.SetPosition(s.WorldSize.Mul(0.5))
+	s.AddChild(s.player)
 
 	// 生成器
 	spawner := &Spawner{}
 	spawner.Init()
-	spawner.SetTarget(player)
+	spawner.SetTarget(s.player)
 	s.spawner = spawner
 	s.AddChild(spawner)
 
 	// HUD状态
-	s.hudStats = screen.AddHudStatsChild(s, &player.Actor, mgl32.Vec2{30.0, 30.0})
+	s.hudStats = screen.AddHudStatsChild(s, &s.player.Actor, mgl32.Vec2{30.0, 30.0})
 	// HUD技能
-	s.hudSkills = screen.AddHudSkillChild(s, player, "assets/UI/Electric-Icon.png", mgl32.Vec2{player.Game().GetScreenSize().X() - 300.0, 30.0}, 0.14, core.AnchorTypeCenter)
+	s.hudSkills = screen.AddHudSkillChild(s, s.player, "assets/UI/Electric-Icon.png", mgl32.Vec2{s.player.Game().GetScreenSize().X() - 300.0, 30.0}, 0.14, core.AnchorTypeCenter)
 	// HUD分数
-	s.hudScore = screen.AddHudTextChild(s, "Score: 0", mgl32.Vec2{player.Game().GetScreenSize().X() - 120.0, 30.0}, mgl32.Vec2{200.0, 50.0},
+	s.hudScore = screen.AddHudTextChild(s, "Score: 0", mgl32.Vec2{s.player.Game().GetScreenSize().X() - 120.0, 30.0}, mgl32.Vec2{200.0, 50.0},
 		"assets/font/VonwaonBitmap-16px.ttf", 32.0, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
 
 	s.buttonPause = screen.AddHudButtonChild(s, s.Game().GetScreenSize().Add(mgl32.Vec2{-230.0, -30.0}), "assets/UI/A_Pause1.png", "assets/UI/A_Pause2.png", "assets/UI/A_Pause3.png", 1.0, core.AnchorTypeCenter)
@@ -69,6 +73,9 @@ func (s *SceneMain) Init() {
 
 	// UI鼠标
 	s.uimouse = screen.AddUIMouseChild(s, "assets/UI/29.png", "assets/UI/30.png", 1.0, core.AnchorTypeCenter)
+
+	// 游戏结束timer
+	s.endTimer = core.AddTimerChild(s, 3.0)
 
 	// // 敌人
 	// enemy := &Enemy{}
@@ -91,6 +98,10 @@ func (s *SceneMain) Update(dt float32) {
 	s.checkButtonRestart()
 	s.checkButtonBack()
 	s.checkButtonPause()
+	if s.player != nil && !s.player.GetActive() {
+		s.endTimer.Start()
+	}
+	s.checkEndTimer()
 }
 
 func (s *SceneMain) Render() {
@@ -130,6 +141,7 @@ func (s *SceneMain) checkButtonRestart() {
 	if !s.buttonRestart.GetIsTrigger() {
 		return
 	}
+	s.Game().SetScore(0)
 	s.Game().SafeChangeScene(s)
 }
 
@@ -141,6 +153,7 @@ func (s *SceneMain) checkButtonBack() {
 	if !s.buttonBack.GetIsTrigger() {
 		return
 	}
+	s.Game().SetScore(0)
 	s.Game().SafeChangeScene(&SceneTitle{})
 }
 
@@ -157,4 +170,18 @@ func (s *SceneMain) checkButtonPause() {
 		return
 	}
 	s.Pause()
+}
+
+// 检查游戏结束timer
+func (s *SceneMain) checkEndTimer() {
+	if s.endTimer != nil && !s.endTimer.TimeOut() {
+		return
+	}
+	s.Pause()
+	s.buttonRestart.SetRenderPosition(s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{-200.0, 0.0}))
+	s.buttonRestart.SetScale(4.0)
+	s.buttonBack.SetRenderPosition(s.Game().GetScreenSize().Mul(0.5).Add(mgl32.Vec2{200.0, 0.0}))
+	s.buttonBack.SetScale(4.0)
+	s.buttonPause.SetActive(false)
+	s.endTimer.Stop()
 }

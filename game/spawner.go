@@ -46,7 +46,7 @@ func (s *Spawner) Update(dt float32) {
 			)
 			enemy := CreateEnemy(nil, pos, s.target)
 			// 敌人产生是从特效精灵动画结束后产生，所以这里生成特效
-			world.AddEffect(core.GetInstance().GetCurrentScene(), "assets/effect/184_3.png", enemy.GetPosition(), 1.0, core.AnchorTypeCenter, enemy)
+			world.AddEffectChild(core.GetInstance().GetCurrentScene(), "assets/effect/184_3.png", enemy.GetPosition(), 1.0, core.AnchorTypeCenter, enemy)
 		}
 		// s.interval = 1000.0
 	}

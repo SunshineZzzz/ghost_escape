@@ -3,8 +3,10 @@ package game
 import (
 	"ghost_escape/game/affiliate"
 	"ghost_escape/game/core"
+	"ghost_escape/game/world"
 
 	"github.com/SunshineZzzz/purego-sdl3/sdl"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 // 玩家
@@ -19,6 +21,10 @@ type Player struct {
 	spriteMoveAnim *affiliate.SpriteAnim
 	// 是否在运动
 	isMoving bool
+	// 受伤闪烁timer
+	flashTimer *core.Timer
+	// 死亡特效
+	deadEffect *world.Effect
 }
 
 var _ core.IObject = (*Player)(nil)
@@ -39,6 +45,12 @@ func (p *Player) Init() {
 	// 雷武器组件
 	p.Weapon = AddWeaponThunderChild(&p.Actor, 2.0, 40.0)
 	// affiliate.AddTextLabelChild(p, "这是主角", "assets/font/VonwaonBitmap-16px.ttf", 16.0, core.AnchorTypeCenter)
+
+	p.deadEffect = world.AddEffectChild(nil, "assets/effect/1764.png", mgl32.Vec2{0.0, 0.0}, 2.0, core.AnchorTypeCenter, nil)
+
+	// 受伤闪烁timer
+	p.flashTimer = core.AddTimerChild(p, 0.4)
+	p.flashTimer.Start()
 }
 
 // 处理事件
@@ -55,12 +67,14 @@ func (p *Player) Update(dt float32) {
 	p.Move(dt)
 	p.checkState()
 	p.syncCamera()
-	// TODO
-	// p.GetAlive()
+	p.checkIsDead()
 }
 
 // 渲染
 func (p *Player) Render() {
+	if p.Stats.GetInvincible() && p.flashTimer.GetProcess() < 0.5 {
+		return
+	}
 	p.Actor.Render()
 }
 
@@ -140,4 +154,16 @@ func (p *Player) TakeDamage(damage float32) {
 	}
 	p.Actor.TakeDamage(damage)
 	p.Game().PlaySound("assets/sound/hit-flesh-02-266309.mp3", false)
+	// fmt.Printf("玩家受到伤害：%f\n", damage)
+}
+
+// 检查是否死亡
+func (p *Player) checkIsDead() {
+	if !p.Stats.GetAlive() {
+		// 玩家死亡
+		p.Game().GetCurrentScene().SafeAddChild(p.deadEffect)
+		p.deadEffect.SetPosition(p.GetPosition())
+		p.SetActive(false)
+		p.Game().PlaySound("assets/sound/female-scream-02-89290.mp3", false)
+	}
 }
