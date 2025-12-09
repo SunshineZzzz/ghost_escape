@@ -28,6 +28,8 @@ type SceneTitle struct {
 	creditsButton *screen.HudButton
 	// 贡献者名单文本
 	creditsText *screen.HudText
+	// UI鼠标
+	uimouse *screen.UIMouse
 }
 
 var _ core.IObject = (*SceneTitle)(nil)
@@ -68,7 +70,7 @@ func (s *SceneTitle) Init() {
 	s.creditsText.SetBgSizeByText(50.0)
 
 	// UI鼠标
-	screen.AddUIMouseChild(s, "assets/UI/pointer_c_shaded.png", "assets/UI/pointer_c_shaded.png", 1.0, core.AnchorTypeTopLeft)
+	s.uimouse = screen.AddUIMouseChild(s, "assets/UI/pointer_c_shaded.png", "assets/UI/pointer_c_shaded.png", 1.0, core.AnchorTypeTopLeft)
 }
 
 // 处理事件
@@ -87,6 +89,7 @@ func (s *SceneTitle) Update(dt float32) {
 	s.colorTimer += dt
 	s.updateColor()
 	if s.creditsText.GetActive() {
+		s.uimouse.Update(dt)
 		return
 	}
 	s.Scene.Update(dt)
