@@ -99,6 +99,7 @@ func (s *SceneMain) HandleEvent(event *sdl.Event) {
 }
 
 func (s *SceneMain) Update(dt float32) {
+	s.checkSlowDown(&dt)
 	s.Scene.Update(dt)
 	s.updateScore()
 	s.checkButtonRestart()
@@ -206,5 +207,13 @@ func (s *SceneMain) SaveData(filePath string) {
 	err = binary.Write(file, binary.LittleEndian, int32(highScore))
 	if err != nil {
 		return
+	}
+}
+
+// 检查是否需要减速
+func (s *SceneMain) checkSlowDown(dt *float32) {
+	if s.Game().GetMouseButtons()&sdl.ButtonRMask != 0 {
+		// 按下右键减速
+		*dt *= 0.4
 	}
 }

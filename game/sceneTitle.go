@@ -37,7 +37,7 @@ var _ core.IScene = (*SceneTitle)(nil)
 func (s *SceneTitle) Init() {
 	s.Scene.Init()
 	s.LoadData("assets/score.dat")
-	sdl.ShowCursor()
+	sdl.HideCursor()
 	s.Game().StopAllMusic()
 	s.Game().StopAllEffects()
 	s.Game().PlayMusic("assets/bgm/Spooky music.mp3", true)
@@ -66,6 +66,9 @@ func (s *SceneTitle) Init() {
 		mgl32.Vec2{500, 500}, "assets/font/VonwaonBitmap-16px.ttf", 16, "assets/UI/Textfield_01.png", core.AnchorTypeCenter)
 	s.creditsText.SetActive(false)
 	s.creditsText.SetBgSizeByText(50.0)
+
+	// UI鼠标
+	screen.AddUIMouseChild(s, "assets/UI/pointer_c_shaded.png", "assets/UI/pointer_c_shaded.png", 1.0, core.AnchorTypeTopLeft)
 }
 
 // 处理事件

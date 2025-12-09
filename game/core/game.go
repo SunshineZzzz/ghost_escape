@@ -61,6 +61,11 @@ type Game struct {
 	// 当前场景
 	currentScene IScene
 	// 鼠标位置
+	// 物理窗口中鼠标坐标，它的范围是从 (0, 0) 到 (WindowWidth, WindowHeight)。如果您把窗口从 1000x800 拉伸到 2000x1600，这些坐标的最大值也会随之变化。
+	// 需要转化到 游戏逻辑坐标
+	// SDL 会负责将 800x600 逻辑画面，根据 LETTERBOX 规则，缩放、居中到玩家的物理窗口上。
+	// 这就是为什么鼠标的物理坐标（例如 1600x900 范围）必须被 “翻译”（去缩放、去偏移）回 800x600 的逻辑坐标，您的游戏代码才能正确识别点击位置。
+	// 放大以后或者缩小以后，逻辑分辨率始终是800X600
 	mousePosition mgl32.Vec2
 	// 鼠标按钮状态
 	mouseButtons sdl.MouseButtonFlags
@@ -87,6 +92,10 @@ func (g *Game) Init(title string, width, height int32, scene IScene) error {
 	}
 
 	// 设置渲染器的逻辑尺寸
+	// sdl.LogicalPresentationLetterbox
+	// 它会把游戏画面放大到窗口允许的最大尺寸，同时不改变画面的比例。
+	// 如果窗口比逻辑画面宽，您会看到左右两侧有黑边(Letterbox)
+	// 如果窗口比逻辑画面高，您会看到顶部和底部有黑边(Letterbox)
 	if !sdl.SetRenderLogicalPresentation(g.sdlRenderer, width, height, sdl.LogicalPresentationLetterbox) {
 		return fmt.Errorf("sdl set render logical presentation error,%s", sdl.GetError())
 	}
@@ -145,8 +154,7 @@ func (g *Game) handleEvent() {
 
 // 更新状态
 func (g *Game) update(dt float32) {
-	// 更新鼠标位置和按钮状态
-	g.mouseButtons = sdl.GetMouseState(&g.mousePosition[0], &g.mousePosition[1])
+	g.updateMouse()
 	g.currentScene.Update(dt)
 }
 
@@ -523,4 +531,14 @@ func (g *Game) DrawPoints(points *[]mgl32.Vec2, renderPos mgl32.Vec2, color sdl.
 		sdl.RenderPoint(g.sdlRenderer, pos.X, pos.Y)
 	}
 	sdl.SetRenderDrawColorFloat(g.sdlRenderer, 0, 0, 0, 1)
+}
+
+// 鼠标从物理坐标转换到游戏逻辑坐标
+func (g *Game) updateMouse() {
+	// 限制比例，不要出现黑边(letterbox)
+	g.mouseButtons = sdl.GetMouseState(&g.mousePosition[0], &g.mousePosition[1])
+	// 获取当前物理窗口大小
+	w, h := int32(0), int32(0)
+	sdl.GetWindowSize(g.sdlWindow, &w, &h)
+	sdl.RenderCoordinatesFromWindow(g.sdlRenderer, g.mousePosition[0], g.mousePosition[1], &g.mousePosition[0], &g.mousePosition[1])
 }
