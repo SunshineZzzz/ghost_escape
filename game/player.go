@@ -153,8 +153,8 @@ func (p *Player) TakeDamage(damage float32) {
 		return
 	}
 	p.Actor.TakeDamage(damage)
-	p.Game().PlaySound("assets/sound/hit-flesh-02-266309.mp3", false)
 	// fmt.Printf("玩家受到伤害：%f\n", damage)
+	p.Game().PlaySound("assets/sound/hit-flesh-02-266309.mp3", false)
 }
 
 // 检查是否死亡

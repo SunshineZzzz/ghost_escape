@@ -425,8 +425,24 @@ func (g *Game) PlayMusic(musicPath string, loop bool) {
 	if err != nil {
 		return
 	}
-	music.SetLoop(loop)
-	music.Play()
+	for _, m := range music {
+		m.SetLoop(loop)
+		if m.Play() {
+			return
+		}
+	}
+	// 走到这里肯定是所有池子都失败了
+	if err = g.assetStore.loadSound(musicPath, SoundTypeMusic); err != nil {
+		fmt.Printf("load music error,%v\n", err)
+		return
+	}
+	music, err = g.assetStore.GetSound(musicPath, SoundTypeMusic)
+	if err != nil {
+		fmt.Printf("load music error,%v\n", err)
+		return
+	}
+	// fmt.Printf("play new music %s\n", musicPath)
+	music[len(music)-1].Play()
 }
 
 // 播放音效
@@ -435,8 +451,24 @@ func (g *Game) PlaySound(soundPath string, loop bool) {
 	if err != nil {
 		return
 	}
-	sound.SetLoop(loop)
-	sound.Play()
+	for _, s := range sound {
+		s.SetLoop(loop)
+		if s.Play() {
+			return
+		}
+	}
+	// 走到这里肯定是所有池子都失败了
+	if err = g.assetStore.loadSound(soundPath, SoundTypeEffect); err != nil {
+		fmt.Printf("load sound error,%v\n", err)
+		return
+	}
+	sound, err = g.assetStore.GetSound(soundPath, SoundTypeEffect)
+	if err != nil {
+		fmt.Printf("load sound error,%v\n", err)
+		return
+	}
+	// fmt.Printf("play new sound %s\n", soundPath)
+	sound[len(sound)-1].Play()
 }
 
 // 停止所有音乐

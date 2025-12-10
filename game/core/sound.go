@@ -26,7 +26,7 @@ const (
 // 声音抽象
 type ISound interface {
 	// 播放声音
-	Play()
+	Play() bool
 	// 暂停声音
 	Pause()
 	// 恢复声音
@@ -243,23 +243,25 @@ func oggAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 }
 
 // 播放
-func (o *oggSound) Play() {
+func (o *oggSound) Play() bool {
 	o.Lock()
 	defer o.Unlock()
 
 	if o.stream == nil || o.id == 0 {
-		return
+		return false
 	}
 
 	if o.isPlaying {
 		// 这里肯定会进来，但是断不到点
-		return
+		return false
 	}
 
 	o.isPlaying = true
 	o.dataPos = 0
 	sdl.ClearAudioStream(o.stream)
 	sdl.ResumeAudioStreamDevice(o.stream)
+
+	return true
 }
 
 // 暂停
@@ -452,23 +454,25 @@ func wavAudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 }
 
 // 播放控制方法（保持不变）
-func (w *wavSound) Play() {
+func (w *wavSound) Play() bool {
 	w.Lock()
 	defer w.Unlock()
 
 	if w.stream == nil || w.id == 0 {
-		return
+		return false
 	}
 
 	if w.isPlaying {
 		// 这里肯定会进来，但是断不到点
-		return
+		return false
 	}
 
 	w.isPlaying = true
 	w.dataPos = 0
 	sdl.ClearAudioStream(w.stream)
 	sdl.ResumeAudioStreamDevice(w.stream)
+
+	return true
 }
 
 // 暂停
@@ -673,23 +677,28 @@ func mp3AudioCallback(userdata unsafe.Pointer, stream *sdl.AudioStream, addition
 }
 
 // 播放
-func (o *mp3Sound) Play() {
+func (o *mp3Sound) Play() bool {
 	o.Lock()
 	defer o.Unlock()
 
 	if o.stream == nil || o.id == 0 {
-		return
+		return false
 	}
 
 	if o.isPlaying {
+		// fmt.Printf("mp3Sound %d is already playing\n", o.id)
 		// 这里肯定会进来，但是断不到点
-		return
+		return false
 	}
+
+	// fmt.Printf("mp3Sound %d will playing\n", o.id)
 
 	o.isPlaying = true
 	o.dataPos = 0
 	sdl.ClearAudioStream(o.stream)
 	sdl.ResumeAudioStreamDevice(o.stream)
+
+	return true
 }
 
 // 暂停

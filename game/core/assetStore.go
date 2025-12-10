@@ -18,7 +18,7 @@ type AssetStore struct {
 	// 存储所有加载的字体
 	fonts map[string]*ttf.Font
 	// 存储所有加载的声音
-	sounds map[string]ISound
+	sounds map[string][]ISound
 }
 
 // 创建资源管理器
@@ -27,7 +27,7 @@ func CreateAssetStore(sdlRenderer *sdl.Renderer) *AssetStore {
 		sdlRenderer: sdlRenderer,
 		textures:    make(map[string]*sdl.Texture),
 		fonts:       make(map[string]*ttf.Font),
-		sounds:      make(map[string]ISound),
+		sounds:      make(map[string][]ISound),
 	}
 }
 
@@ -40,11 +40,13 @@ func (a *AssetStore) Clean() {
 		ttf.CloseFont(font)
 	}
 	for _, sound := range a.sounds {
-		sound.Close()
+		for _, s := range sound {
+			s.Close()
+		}
 	}
 	a.textures = make(map[string]*sdl.Texture)
 	a.fonts = make(map[string]*ttf.Font)
-	a.sounds = make(map[string]ISound)
+	a.sounds = make(map[string][]ISound)
 }
 
 // 载入图片素材
@@ -63,7 +65,10 @@ func (a *AssetStore) loadSound(filePath string, soundType SoundType) error {
 	if err != nil {
 		return fmt.Errorf("load sound error,%s", err.Error())
 	}
-	a.sounds[filePath] = sound
+	if _, ok := a.sounds[filePath]; !ok {
+		a.sounds[filePath] = make([]ISound, 0)
+	}
+	a.sounds[filePath] = append(a.sounds[filePath], sound)
 	return nil
 }
 
@@ -91,7 +96,7 @@ func (a *AssetStore) GetImage(filePath string) (*sdl.Texture, error) {
 }
 
 // 获取声音素材
-func (a *AssetStore) GetSound(filePath string, soundType SoundType) (ISound, error) {
+func (a *AssetStore) GetSound(filePath string, soundType SoundType) ([]ISound, error) {
 	sound, ok := a.sounds[filePath]
 	if ok {
 		return sound, nil
@@ -106,8 +111,10 @@ func (a *AssetStore) GetSound(filePath string, soundType SoundType) (ISound, err
 // 停止所有音乐
 func (a *AssetStore) StopAllSound(soundType SoundType) {
 	for _, sound := range a.sounds {
-		if sound.GetSoundType() == soundType {
-			sound.Stop()
+		for _, s := range sound {
+			if s.GetSoundType() == soundType {
+				s.Stop()
+			}
 		}
 	}
 }
@@ -115,8 +122,10 @@ func (a *AssetStore) StopAllSound(soundType SoundType) {
 // 暂停所有音效
 func (a *AssetStore) PauseAllSound(soundType SoundType) {
 	for _, sound := range a.sounds {
-		if sound.GetSoundType() == soundType {
-			sound.Pause()
+		for _, s := range sound {
+			if s.GetSoundType() == soundType {
+				s.Pause()
+			}
 		}
 	}
 }
@@ -124,8 +133,10 @@ func (a *AssetStore) PauseAllSound(soundType SoundType) {
 // 恢复所有音效
 func (a *AssetStore) ResumeAllSound(soundType SoundType) {
 	for _, sound := range a.sounds {
-		if sound.GetSoundType() == soundType {
-			sound.Resume()
+		for _, s := range sound {
+			if s.GetSoundType() == soundType {
+				s.Resume()
+			}
 		}
 	}
 }
